@@ -73,7 +73,6 @@ lib.mkIf config.userSettings.noctalia.enable {
           id = "g3";
           members = [
             "caffeine"
-            "theme_mode"
             "clipboard"
             "screenshot"
           ];

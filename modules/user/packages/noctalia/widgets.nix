@@ -6,8 +6,20 @@ lib.mkIf config.userSettings.noctalia.enable {
       display_mode = "graphic";
     };
 
+    bluetooth = {
+      actions = {
+        left = "bluetooth-toggle";
+        right = "panel-toggle control-center bluetooth";
+      };
+    };
+
     brightness = {
       show_label = false;
+
+      actions = {
+        scroll_down = "brightness-up";
+        scroll_up = "brightness-down";
+      };
     };
 
     control-center = {
@@ -16,6 +28,13 @@ lib.mkIf config.userSettings.noctalia.enable {
 
     input_volume = {
       show_label = false;
+
+      actions = {
+        left = "mic-mute";
+        right = "panel-toggle control-center audio";
+        scroll_down = "mic-volume-up";
+        scroll_up = "mic-volume-down";
+      };
     };
 
     media = {
@@ -25,10 +44,29 @@ lib.mkIf config.userSettings.noctalia.enable {
 
     network = {
       show_label = false;
+
+      actions = {
+        left = "network-toggle";
+        right = "panel-toggle control-center network";
+      };
     };
 
     output_volume = {
       show_label = false;
+
+      actions = {
+        left = "volume-mute";
+        right = "panel-toggle control-center audio";
+        scroll_down = "volume-up";
+        scroll_up = "volume-down";
+      };
+    };
+
+    power_profile = {
+      actions = {
+        scroll_down = "power-cycle next";
+        scroll_up = "power-cycle prev";
+      };
     };
 
     sysmon = {
