@@ -52,6 +52,7 @@
     programs.gwenview.enable = true;
     programs.pavucontrol.enable = true;
     programs.fastfetch.enable = true;
+    programs.direnv.enable = true;
     xdg.enable = true;
     theme.enable = true;
     stylix.enable = true;

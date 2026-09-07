@@ -60,7 +60,7 @@ Currently available:
 |---|---|
 | `base` | Just a `flake.nix` (only `nixpkgs` input + empty `devShells.default`); no structure or docs, extend it as you go |
 
-Each generated project is a single self-contained `flake.nix` with no pre-defined structure.
+Each generated project is a single self-contained `flake.nix` with no pre-defined structure. It also ships a `.envrc` for **direnv** (enabled via `userSettings.programs.direnv`): `cd` into the project and its devShell packages join your *current* shell (zsh aliases, starship, fzf stay intact). Authorize it once per project with `direnv allow`.
 
 ## Deploy
 
