@@ -1,0 +1,6 @@
+# Nix build artifacts
+result
+result-*
+
+# NixOS switcher
+*.qcow2
