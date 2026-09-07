@@ -48,6 +48,13 @@
       );
     in
     {
+      templates = {
+        base = {
+          path = ./templates/base;
+          description = "Base project dev shell for compilers/parsers and general development";
+        };
+      };
+
       nixosConfigurations = builtins.listToAttrs (
         map (host: {
           name = host;

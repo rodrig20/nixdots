@@ -45,6 +45,23 @@ Vendor knobs live in `hosts/<name>/hardware/<name>.nix`:
 `modules/system/hardware/cpu/*.nix` and `gpu/*.nix` apply settings via `mkIf` based on `hardware.pc`.
 
 
+## Project templates
+
+`flake.nix` exposes flake templates for scaffolding new standalone projects:
+
+```bash
+nix flake init -t .#base          # local
+nix flake init -t github:rodri/nixdots#base   # from anywhere
+```
+
+Currently available:
+
+| Template | Purpose |
+|---|---|
+| `base` | Just a `flake.nix` (only `nixpkgs` input + empty `devShells.default`); no structure or docs, extend it as you go |
+
+Each generated project is a single self-contained `flake.nix` with no pre-defined structure.
+
 ## Deploy
 
 ```bash
