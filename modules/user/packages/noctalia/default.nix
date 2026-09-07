@@ -10,6 +10,7 @@ in
   imports = [
     ./bar.nix
     ./control-center.nix
+    ./desktop-widgets.nix
     ./idle.nix
     ./lockscreen.nix
     ./shell.nix
