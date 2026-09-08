@@ -53,6 +53,7 @@ in
         profileNames = [ "default" ];
       };
       targets.btop.enable = true;
+      targets.vscode.enable = true;
     };
   };
 }

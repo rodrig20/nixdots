@@ -8,6 +8,10 @@ in
   options.userSettings.programs.vscode.enable = lib.mkEnableOption "VSCode GUI editor";
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ pkgs.vscode-fhs ];
+    programs.vscode = {
+      enable = true;
+      package = pkgs.vscode-fhs;
+      profiles.default.userSettings = lib.mkForce { };
+    };
   };
 }
