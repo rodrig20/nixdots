@@ -1,5 +1,3 @@
-local colors = require("colors")
-
 hl.config({
     gestures = {
         workspace_swipe_distance = 700,
@@ -13,11 +11,6 @@ hl.config({
         gaps_in  = 10,
         gaps_out = 15,
         border_size = 3,
-
-        col = {
-            active_border   = colors.active_border,
-            inactive_border = colors.inactive_border,
-        },
 
         resize_on_border = true,
         allow_tearing = false,
@@ -59,7 +52,6 @@ hl.config({
             range = 20,
             render_power = 10,
             offset = {0, 2},
-            color = "0x66000000",
         },
         dim_inactive = true,
 		dim_strength = 0.1,
