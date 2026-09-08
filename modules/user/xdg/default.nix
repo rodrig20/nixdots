@@ -19,11 +19,11 @@ in
         "x-scheme-handler/https" = [ "zen-twilight.desktop" ];
         "x-scheme-handler/file" = [ "zen-twilight.desktop" ];
 
-        "image/png" = [ "org.kde.gwenview.desktop" ];
-        "image/jpeg" = [ "org.kde.gwenview.desktop" ];
-        "image/gif" = [ "org.kde.gwenview.desktop" ];
-        "image/webp" = [ "org.kde.gwenview.desktop" ];
-        "image/svg+xml" = [ "org.kde.gwenview.desktop" ];
+        "image/png" = [ "org.gnome.Loupe.desktop" ];
+        "image/jpeg" = [ "org.gnome.Loupe.desktop" ];
+        "image/gif" = [ "org.gnome.Loupe.desktop" ];
+        "image/webp" = [ "org.gnome.Loupe.desktop" ];
+        "image/svg+xml" = [ "org.gnome.Loupe.desktop" ];
       };
     };
   };

@@ -50,7 +50,7 @@
     programs.opencode.enable = true;
     programs.nautilus.enable = true;
     programs.onlyoffice.enable = true;
-    programs.gwenview.enable = true;
+    programs.loupe.enable = true;
     programs.pavucontrol.enable = true;
     programs.fastfetch.enable = true;
     programs.direnv.enable = true;
