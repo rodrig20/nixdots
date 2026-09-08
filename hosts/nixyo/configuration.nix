@@ -28,6 +28,7 @@
     users.description = "Rodrigo";
     users.extraGroups = [ "networkmanager" "wheel" "render" "video" "audio" ];
     hardware.enable = true;
+    keyring.enable = true;
     desktop.enable = true;
     stylix.enable = true;
   };

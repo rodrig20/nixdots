@@ -9,9 +9,6 @@ hl.on("hyprland.start", function ()
     -- Noctalia (systemd user service, supervised by the unit)
     hl.exec_cmd("systemctl --user start noctalia.service")
 
-    -- Keyring
-    hl.exec_cmd("gnome-keyring-daemon --start --components=secrets,pkcs11,ssh")
-
     -- Restart portals so they catch the environment
     hl.exec_cmd("systemctl --user stop xdg-desktop-portal xdg-desktop-portal-hyprland")
     hl.exec_cmd("sleep 1 && systemctl --user start xdg-desktop-portal-hyprland xdg-desktop-portal")
