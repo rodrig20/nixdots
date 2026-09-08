@@ -1,5 +1,5 @@
 # Stylix system theming: GDM greeter + package overlays.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   cfg = config.systemSettings.stylix;
@@ -10,6 +10,9 @@ in
   config = lib.mkIf cfg.enable {
     stylix = {
       enable = true;
+      # Custom scheme (same as the user-level one). To use a built-in scheme
+      # instead: "${inputs.tinted-schemes}/base16/<name>.yaml"
+      # (or base24/<name>.yaml)
       base16Scheme = ../../../modules/user/stylix/github-purple.yaml;
       overlays.enable = true;
       targets.gnome.enable = true;

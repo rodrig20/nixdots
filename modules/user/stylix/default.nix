@@ -1,5 +1,5 @@
 # Stylix user theming from a fixed base16 scheme.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   cfg = config.userSettings.stylix;
@@ -15,6 +15,9 @@ in
     stylix = {
       enable = true;
 
+      # Custom scheme (see ./github-purple.yaml). To use a built-in scheme
+      # instead: "${inputs.tinted-schemes}/base16/<name>.yaml"
+      # (or base24/<name>.yaml)
       base16Scheme = ./github-purple.yaml;
 
       polarity = "dark";
