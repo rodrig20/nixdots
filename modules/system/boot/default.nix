@@ -13,5 +13,7 @@ in
     boot.loader.systemd-boot.configurationLimit = 10;
 
     boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto;
+
+    boot.tmp.cleanOnBoot = true;
   };
 }
