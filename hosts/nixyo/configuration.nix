@@ -32,6 +32,7 @@
     desktop.enable = true;
     stylix.enable = true;
     fonts.enable = true;
+    virtualisation.podman.enable = true;
   };
 
   home-manager.users.rodri.userSettings = {
