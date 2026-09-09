@@ -31,6 +31,7 @@
     keyring.enable = true;
     desktop.enable = true;
     stylix.enable = true;
+    fonts.enable = true;
   };
 
   home-manager.users.rodri.userSettings = {
