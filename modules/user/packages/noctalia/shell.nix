@@ -30,4 +30,8 @@ lib.mkIf config.userSettings.noctalia.enable {
       size = 16;
     };
   };
+
+  programs.noctalia.settings.wallpaper = {
+    directory = "${config.home.homeDirectory}/Pictures/Wallpapers";
+  };
 }
