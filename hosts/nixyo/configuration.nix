@@ -33,6 +33,7 @@
     stylix.enable = true;
     fonts.enable = true;
     virtualisation.podman.enable = true;
+    ollama.enable = true;
   };
 
   home-manager.users.rodri.userSettings = {
@@ -49,6 +50,7 @@
     programs.zen-browser.enable = true;
     programs.clipboard.enable = true;
     programs.keyring.enable = true;
+    programs.alpaca.enable = true;
     programs.opencode.enable = true;
     programs.nautilus.enable = true;
     programs.onlyoffice.enable = true;
