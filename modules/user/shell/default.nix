@@ -32,6 +32,11 @@ in
       enable = true;
     };
 
+    programs.zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     home.shellAliases = {
       ls = "eza --icons=auto";
       ll = "eza -l --icons=auto";
@@ -39,10 +44,13 @@ in
       lt = "eza --tree --icons=auto";
       grep = "rg --smart-case";
       cat = "bat";
+      cd = "z";
+      cdi = "zi";
       # 'r' prefix bypasses the aliased replacements via `command`
       rls = "command ls";
       rgrep = "command grep";
       rcat = "command cat";
+      rcd = "command cd";
     };
   };
 }
