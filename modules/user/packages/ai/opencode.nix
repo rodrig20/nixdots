@@ -1,5 +1,5 @@
 # OpenCode AI coding agent.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, osConfig, ... }:
 
 let
   cfg = config.userSettings.programs.opencode;
@@ -13,6 +13,15 @@ let
 
     # New sessions start in plan mode (read-only analysis, no edits until you switch agent).
     default_agent = "plan";
+
+    # Local models via Ollama. Only present when the Ollama service is enabled
+    provider = lib.optionalAttrs osConfig.systemSettings.ollama.enable {
+      ollama = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "Ollama (local)";
+        options.baseURL = "http://localhost:11434/v1";
+      };
+    };
 
     snapshot = true;
     formatter = true;
