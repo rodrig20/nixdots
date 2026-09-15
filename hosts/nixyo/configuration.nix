@@ -33,6 +33,7 @@
     stylix.enable = true;
     fonts.enable = true;
     virtualisation.podman.enable = true;
+    virtualisation.libvirt.enable = true;
     ollama.enable = true;
   };
 
