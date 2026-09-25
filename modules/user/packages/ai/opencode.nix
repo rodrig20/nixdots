@@ -1,5 +1,5 @@
 # OpenCode AI coding agent.
-{ config, pkgs, lib, osConfig, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   cfg = config.userSettings.programs.opencode;
@@ -7,15 +7,15 @@ let
   defaultSettings = {
     # Nix manages the version, not opencode itself.
     autoupdate = false;
-    
+
     share = "disabled";
     username = config.userSettings.name;
 
     # New sessions start in plan mode (read-only analysis, no edits until you switch agent).
     default_agent = "plan";
 
-    # Local models via Ollama. Only present when the Ollama service is enabled
-    provider = lib.optionalAttrs osConfig.systemSettings.ollama.enable {
+    # Local models via Ollama. Wired per-host via `useOllama`
+    provider = lib.optionalAttrs cfg.useOllama {
       ollama = {
         npm = "@ai-sdk/openai-compatible";
         name = "Ollama (local)";
@@ -101,6 +101,8 @@ in
 {
   options.userSettings.programs.opencode = {
     enable = lib.mkEnableOption "OpenCode";
+
+    useOllama = lib.mkEnableOption "Ollama (local) provider for OpenCode";
 
     settings = lib.mkOption {
       type = lib.types.attrs;

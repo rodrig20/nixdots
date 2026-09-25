@@ -53,6 +53,7 @@
     programs.keyring.enable = true;
     programs.alpaca.enable = true;
     programs.opencode.enable = true;
+    programs.opencode.useOllama = true;
     programs.nautilus.enable = true;
     programs.onlyoffice.enable = true;
     programs.loupe.enable = true;
