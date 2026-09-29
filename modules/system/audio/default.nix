@@ -13,6 +13,27 @@ in
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
+
+      wireplumber = {
+        # Bluetooth auto-switch.
+        extraScripts."bluetooth-autoswitch.lua" =
+          builtins.readFile ./bluetooth-autoswitch.lua;
+
+        extraConfig."49-bluetooth-autoswitch" = {
+          "wireplumber.components" = [
+            {
+              name = "bluetooth-autoswitch.lua";
+              type = "script/lua";
+              provides = "custom.bluetooth-autoswitch";
+            }
+          ];
+          "wireplumber.profiles" = {
+            main = {
+              "custom.bluetooth-autoswitch" = "required";
+            };
+          };
+        };
+      };
     };
 
     # Realtime scheduling for low-latency audio
