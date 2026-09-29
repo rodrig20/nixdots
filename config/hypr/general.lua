@@ -110,6 +110,11 @@ hl.window_rule({
   opaque = true,
 })
 
+hl.window_rule({
+  match = { float = true, pin = true },
+  opaque = true,
+})
+
 hl.workspace_rule({ workspace = "f[1]", gaps_out = 5, no_border = true})
 hl.workspace_rule({ workspace = "s[true]", gaps_out = 50 })
 hl.workspace_rule({ workspace = "s[true]f[1]", gaps_out = 15 })

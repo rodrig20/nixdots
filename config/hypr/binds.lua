@@ -78,6 +78,7 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized", action
 hl.bind(mainMod .. " + D", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Toggle fullscreen" })
 hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating" })
 hl.bind(mainMod .. " + ALT + T", function() hl.dispatch(hl.dsp.window.float({ action = "toggle" })); hl.dispatch(hl.dsp.window.pin()) end, { description = "Toggle floating and pinned" })
+hl.bind(mainMod .. " + P", function() hl.dispatch(hl.dsp.window.float({ action = "toggle" })); hl.dispatch(hl.dsp.window.pin()) end, { description = "Toggle floating and pinned" })
 
 -- Layout Splits & Groups
 hl.bind(mainMod .. " + G", hl.dsp.group.toggle(), { description = "Toggle window group" })
