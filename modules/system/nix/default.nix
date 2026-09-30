@@ -18,6 +18,16 @@ in
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;
       max-jobs = "auto";
+      substituters = [
+        "https://cache.nixos.org"
+        "https://noctalia.cachix.org"
+        "https://attic.xuyh0120.win/lantian"
+      ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+        "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+      ];
     };
 
     # Lower IO priority for the nix daemon
