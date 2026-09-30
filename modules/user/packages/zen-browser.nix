@@ -26,7 +26,7 @@ in
           # Dark Reader
           "addon@darkreader.org" = mkInstalled "darkreader";
           # Bitwarden
-          "{446900e4-71c2-419f-a85b-1dda84116866}" = mkInstalled "bitwarden-password-manager";
+          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = mkInstalled "bitwarden-password-manager";
         };
     };
 
