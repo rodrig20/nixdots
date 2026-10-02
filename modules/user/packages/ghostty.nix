@@ -12,6 +12,16 @@ in
       enable = true;
       settings = {
         "font-size" = 16;
+
+        # Ctrl/Alt + setas movem palavra a palavra. O zsh mapeia \e[b e \e[f
+        # para backward-word/forward-word, mas nao as sequencias xterm 1;5C/D
+        # que os terminais enviam por omissao.
+        keybind = [
+          "ctrl+arrow_left=esc:b"
+          "ctrl+arrow_right=esc:f"
+          "alt+arrow_left=esc:b"
+          "alt+arrow_right=esc:f"
+        ];
       };
     };
   };
