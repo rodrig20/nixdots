@@ -46,7 +46,10 @@ in
         };
 
         plugins = {
-          enabled = [ "elijaharch/wl-screen-mirror" ]; # Needs pkgs.wl-mirror on PATH
+          enabled = [
+            "elijaharch/wl-screen-mirror" # Needs pkgs.wl-mirror on PATH
+            "levi/warp" # Needs the warp-svc service and a registered client
+          ];
           auto_update = "all";
         };
 

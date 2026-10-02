@@ -22,6 +22,7 @@
     git.enable = true;
     networking.enable = true;
     networking.hostName = "nixyo";
+    networking.warp.enable = true;
     audio.enable = true;
     users.enable = true;
     users.name = "rodri";
