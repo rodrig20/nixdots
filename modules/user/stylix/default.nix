@@ -45,6 +45,7 @@ in
       targets.ghostty.enable = true;
       targets.hyprland.enable = true;
       targets.opencode.enable = true;
+      targets.vesktop.enable = true;
       targets.micro.enable = true;
       targets.yazi.enable = true;
       targets.firefox.enable = true;

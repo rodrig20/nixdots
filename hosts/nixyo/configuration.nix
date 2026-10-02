@@ -49,6 +49,7 @@
     programs.ghostty.enable = true;
     programs.yazi.enable = true;
     programs.zen-browser.enable = true;
+    programs.vesktop.enable = true;
     programs.clipboard.enable = true;
     programs.keyring.enable = true;
     programs.alpaca.enable = true;
