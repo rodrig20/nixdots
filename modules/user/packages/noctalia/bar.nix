@@ -75,6 +75,7 @@ lib.mkIf config.userSettings.noctalia.enable {
             "caffeine"
             "clipboard"
             "screenshot"
+            "mirror"
           ];
           opacity = 1.0;
           padding = 6.0;

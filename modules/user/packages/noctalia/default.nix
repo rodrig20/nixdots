@@ -45,6 +45,11 @@ in
           scale = 1.1;
         };
 
+        plugins = {
+          enabled = [ "elijaharch/wl-screen-mirror" ]; # Needs pkgs.wl-mirror on PATH
+          auto_update = "all";
+        };
+
         theme = {
           templates = {
             builtin_ids = [ ];

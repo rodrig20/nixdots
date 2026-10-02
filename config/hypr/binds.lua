@@ -1,7 +1,6 @@
 -- Configuration
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 local workspaceGroupSize = 10
-local is_mirrored = true
 local battery_saver = false
 
 function layout_bind(default_action, overrides)
@@ -145,25 +144,7 @@ hl.bind(mainMod .. " + SHIFT + mouse:272", hl.dsp.window.resize(),   { mouse = t
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window with mouse" })
 
 -- Monitor
-hl.bind(mainMod .. " + SHIFT + K", function()
-    is_mirrored = not is_mirrored
-    if is_mirrored then
-        hl.monitor({
-            output = "",
-            mode = "preferred",
-            position = "auto",
-            scale = 1,
-            mirror = "eDP-1"
-        })
-    else
-        hl.monitor({
-            output = "",
-            mode = "preferred",
-            position = "auto",
-            scale = 1,
-        })
-    end
-end,   { description = "Monitor mirror toggle" })
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("noctalia msg panel-toggle elijaharch/wl-screen-mirror:controls"), { description = "Open the screen mirror panel" })
 
 -- Media Keys
 hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("noctalia msg volume-up"),       { locked = true, repeating = true, description = "Raise volume" })
