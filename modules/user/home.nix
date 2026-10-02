@@ -4,7 +4,6 @@
 {
   imports = [
     inputs.zen-browser.homeModules.twilight
-    inputs.noctalia.homeModules.default
 
     ./default.nix
   ];
