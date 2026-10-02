@@ -76,6 +76,7 @@ lib.mkIf config.userSettings.noctalia.enable {
               "caffeine"
               "clipboard"
               "screenshot"
+              "color_picker"
               "mirror"
               "warp"
             ];
@@ -119,6 +120,15 @@ lib.mkIf config.userSettings.noctalia.enable {
       actions = {
         left = "exec noctalia msg plugin levi/warp:service all toggle;sleep 0.1;noctalia msg plugin levi/warp:service all refresh";
         right = "exec noctalia msg panel-toggle levi/warp:panel";
+      };
+    };
+
+    widget.color_picker = {
+      type = "oldirtty/color_picker:widget";
+
+      actions = {
+        left = "exec noctalia msg plugin oldirtty/color_picker:service all pick";
+        right = "exec noctalia msg panel-toggle oldirtty/color_picker:panel";
       };
     };
   };

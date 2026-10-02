@@ -49,6 +49,7 @@ in
           enabled = [
             "elijaharch/wl-screen-mirror" # Needs pkgs.wl-mirror on PATH
             "levi/warp" # Needs the warp-svc service and a registered client
+            "oldirtty/color_picker" # Needs pkgs.hyprpicker on PATH
           ];
           auto_update = "all";
         };
