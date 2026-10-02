@@ -15,18 +15,18 @@ in
       # Pre-install extensions from AMO on first start
       policies.ExtensionSettings =
         let
-          mkInstalled = slug: {
+          mkInstalled = slug: privateBrowsing: {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/${slug}/latest.xpi";
             installation_mode = "normal_installed";
-          };
+          } // lib.optionalAttrs privateBrowsing { private_browsing = true; };
         in
         {
           # uBlock Origin
-          "uBlock0@raymondhill.net" = mkInstalled "ublock-origin";
+          "uBlock0@raymondhill.net" = mkInstalled "ublock-origin" true;
           # Dark Reader
-          "addon@darkreader.org" = mkInstalled "darkreader";
+          "addon@darkreader.org" = mkInstalled "darkreader" true;
           # Bitwarden
-          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = mkInstalled "bitwarden-password-manager";
+          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = mkInstalled "bitwarden-password-manager" false;
         };
 
       # Pin the uBlock icon to the main toolbar
