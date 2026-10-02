@@ -28,6 +28,12 @@ in
           # Bitwarden
           "{446900e4-71c2-419f-a6a7-df9c091e268b}" = mkInstalled "bitwarden-password-manager";
         };
+
+      # Pin the uBlock icon to the main toolbar
+      profiles.default.extensionButtons = {
+        "nav-bar" = [ "uBlock0@raymondhill.net" ];
+      };
+
     };
 
     # Alias `zen-browser` to the `zen-twilight` binary on PATH.
