@@ -13,6 +13,7 @@ in
     ./desktop-widgets.nix
     ./idle.nix
     ./lockscreen.nix
+    ./session.nix
     ./shell.nix
     ./widgets.nix
   ];
