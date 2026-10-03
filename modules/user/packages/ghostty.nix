@@ -21,6 +21,7 @@ in
           "ctrl+arrow_right=esc:f"
           "alt+arrow_left=esc:b"
           "alt+arrow_right=esc:f"
+          "alt+delete=esc:d"
         ];
       };
     };
