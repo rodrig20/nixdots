@@ -13,15 +13,19 @@ in
       settings = {
         "font-size" = 16;
 
-        # Ctrl/Alt + arrows move word by word. Zsh maps \e[b and \e[f
-        # to backward-word/forward-word, but not the default xterm 1;5C/D
-        # sequences that terminals send.
+        # Two-level word navigation: plain Alt stops at `/` (WORDCHARS
+        # is trimmed in shell/default.nix), Alt+Shift covers whole paths
+        # via custom zsh widgets bound to the sequences below.
         keybind = [
           "ctrl+arrow_left=esc:b"
           "ctrl+arrow_right=esc:f"
           "alt+arrow_left=esc:b"
           "alt+arrow_right=esc:f"
+          "alt+shift+arrow_left=csi:1;4D"
+          "alt+shift+arrow_right=csi:1;4C"
           "alt+delete=esc:d"
+          "alt+shift+backspace=text:\\x1b[127;4u"
+          "alt+shift+delete=csi:3;4~"
         ];
       };
     };

@@ -12,6 +12,50 @@ in
       enable = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
+      autocd = true;
+
+      history = {
+        size = 50000;
+        save = 50000;
+        share = true;
+        extended = true;
+        ignoreDups = true;
+        ignoreSpace = true;
+        expireDuplicatesFirst = true;
+      };
+
+      initExtra = ''
+        # Make `/` a word separator
+        WORDCHARS=''${WORDCHARS//\/}
+        setopt interactivecomments
+
+        # Alt+Shift variants of the above include slashes again (see ghostty.nix).
+        backward-kill-word-with-slashes() {
+          local WORDCHARS="''${WORDCHARS}/"
+          zle backward-kill-word
+        }
+        kill-word-with-slashes() {
+          local WORDCHARS="''${WORDCHARS}/"
+          zle kill-word
+        }
+        zle -N backward-kill-word-with-slashes
+        zle -N kill-word-with-slashes
+        bindkey '^[[127;4u' backward-kill-word-with-slashes
+        bindkey '^[[3;4~' kill-word-with-slashes
+
+        backward-word-with-slashes() {
+          local WORDCHARS="''${WORDCHARS}/"
+          zle backward-word
+        }
+        forward-word-with-slashes() {
+          local WORDCHARS="''${WORDCHARS}/"
+          zle forward-word
+        }
+        zle -N backward-word-with-slashes
+        zle -N forward-word-with-slashes
+        bindkey '^[[1;4D' backward-word-with-slashes
+        bindkey '^[[1;4C' forward-word-with-slashes
+      '';
     };
 
     programs.starship = {
