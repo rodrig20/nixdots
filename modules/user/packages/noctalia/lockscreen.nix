@@ -1,6 +1,14 @@
 { config, pkgs, lib, ... }:
 
 lib.mkIf config.userSettings.noctalia.enable {
+  programs.noctalia.settings.lockscreen.transition = [
+    "disc"
+    "honeycomb"
+    "stripes"
+    "wipe"
+    "zoom"
+  ];
+
   programs.noctalia.settings.lockscreen_widgets = {
     enabled = false;
     schema_version = 2;

@@ -15,6 +15,7 @@ in
     ./lockscreen.nix
     ./session.nix
     ./shell.nix
+    ./wallpaper.nix
     ./widgets.nix
   ];
 
