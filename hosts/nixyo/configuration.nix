@@ -51,7 +51,10 @@
     programs.vscode.enable = true;
     programs.ghostty.enable = true;
     programs.yazi.enable = true;
-    programs.zen-browser.enable = true;
+    programs.zen-browser = {
+      enable = true;
+      uiScale = "1.05";
+    };
     programs.vesktop.enable = true;
     programs.wl-mirror.enable = true;
     programs.hyprpicker.enable = true;

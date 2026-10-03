@@ -5,7 +5,16 @@ let
   cfg = config.userSettings.programs.zen-browser;
 in
 {
-  options.userSettings.programs.zen-browser.enable = lib.mkEnableOption "Zen Browser";
+  options.userSettings.programs.zen-browser = {
+    enable = lib.mkEnableOption "Zen Browser";
+
+    uiScale = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = "1.0";
+      example = "1.5";
+      description = "Zen UI + web content scale via layout.css.devPixelsPerPx.";
+    };
+  };
 
   config = lib.mkIf cfg.enable {
     programs.zen-browser = {
@@ -32,6 +41,11 @@ in
       # Pin the uBlock icon to the main toolbar
       profiles.default.extensionButtons = {
         "nav-bar" = [ "uBlock0@raymondhill.net" ];
+      };
+
+      # UI + web content scale (userSettings.programs.zen-browser.uiScale).
+      profiles.default.settings = lib.optionalAttrs (cfg.uiScale != null) {
+        "layout.css.devPixelsPerPx" = cfg.uiScale;
       };
 
     };
