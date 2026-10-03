@@ -36,6 +36,8 @@ in
           "addon@darkreader.org" = mkInstalled "darkreader" true;
           # Bitwarden
           "{446900e4-71c2-419f-a6a7-df9c091e268b}" = mkInstalled "bitwarden-password-manager" false;
+          # Portuguese (PT) spellcheck dictionary
+          "pt-PT@dictionaries.addons.mozilla.org" = mkInstalled "european-portuguese-spellcheck" true;
         };
 
       # Pin the uBlock icon to the main toolbar
@@ -43,10 +45,17 @@ in
         "nav-bar" = [ "uBlock0@raymondhill.net" ];
       };
 
-      # UI + web content scale (userSettings.programs.zen-browser.uiScale).
-      profiles.default.settings = lib.optionalAttrs (cfg.uiScale != null) {
-        "layout.css.devPixelsPerPx" = cfg.uiScale;
-      };
+      profiles.default.settings =
+        {
+          # Never auto-offer page translation (manual translation keeps working).
+          "browser.translations.automaticallyPopup" = false;
+          # Default spellcheck language.
+          "spellchecker.dictionary" = "pt-PT";
+        }
+        // lib.optionalAttrs (cfg.uiScale != null) {
+          # UI + web content scale (userSettings.programs.zen-browser.uiScale).
+          "layout.css.devPixelsPerPx" = cfg.uiScale;
+        };
 
     };
 
