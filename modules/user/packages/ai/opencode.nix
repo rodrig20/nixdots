@@ -4,6 +4,109 @@
 let
   cfg = config.userSettings.programs.opencode;
 
+  # Read-only commands. Excluded on purpose: `cd` (use the bash tool's `workdir`, which takes an absolute path), plus `find`, `sed`, `awk`, `env` and `printenv`.
+  readOnlyCommands = [
+    "apropos"
+    "arch"
+    "b2sum"
+    "base32"
+    "base64"
+    "basename"
+    "blkid"
+    "cat"
+    "cksum"
+    "cmp"
+    "column"
+    "comm"
+    "cut"
+    "date"
+    "df"
+    "diff"
+    "dirname"
+    "dmidecode"
+    "du"
+    "echo"
+    "expr"
+    "false"
+    "file"
+    "findmnt"
+    "fmt"
+    "fold"
+    "free"
+    "getconf"
+    "getent"
+    "getfacl"
+    "grep"
+    "groups"
+    "head"
+    "hostname"
+    "iconv"
+    "id"
+    "info"
+    "join"
+    "jq"
+    "locale"
+    "logname"
+    "ls"
+    "lsblk"
+    "lscpu"
+    "lspci"
+    "lsusb"
+    "man"
+    "md5sum"
+    "mountpoint"
+    "nl"
+    "nm"
+    "nproc"
+    "numfmt"
+    "objdump"
+    "od"
+    "paste"
+    "pgrep"
+    "printf"
+    "ps"
+    "pwd"
+    "readelf"
+    "readlink"
+    "realpath"
+    "rev"
+    "rg"
+    "seq"
+    "sha1sum"
+    "sha256sum"
+    "sha512sum"
+    "shuf"
+    "sleep"
+    "sort"
+    "stat"
+    "strings"
+    "sum"
+    "tac"
+    "tail"
+    "tr"
+    "tree"
+    "true"
+    "tsort"
+    "tty"
+    "type"
+    "uname"
+    "unexpand"
+    "uniq"
+    "uptime"
+    "users"
+    "wc"
+    "whatis"
+    "which"
+    "who"
+    "whoami"
+    "xxd"
+  ];
+
+  # Rules match the whole command, so the trailing `*` is required.
+  readOnlyRules = lib.listToAttrs (map
+    (cmd: lib.nameValuePair "${cmd}*" (lib.hm.dag.entryAfter [ "*" ] "allow"))
+    readOnlyCommands);
+
   defaultSettings = {
     # Nix manages the version, not opencode itself.
     autoupdate = false;
@@ -50,23 +153,68 @@ let
       webfetch = "allow";
       websearch = "allow";
       edit = "ask";
-      bash = {
-        "*" = lib.hm.dag.entryBefore [
-          "git status*"
-          "git diff*"
-          "git log*"
-          "git commit*"
-          "nix flake check*"
-          "nix build* --dry-run*"
-        ] "ask";
-        "git status*" = lib.hm.dag.entryAfter [ "*" ] "allow";
-        "git diff*" = lib.hm.dag.entryAfter [ "*" ] "allow";
-        "git log*" = lib.hm.dag.entryAfter [ "*" ] "allow";
-        # /commit only drafts the message, never runs git commit.
-        "git commit*" = lib.hm.dag.entryAfter [ "*" ] "deny";
-        "nix flake check*" = lib.hm.dag.entryAfter [ "*" ] "allow";
-        "nix build* --dry-run*" = lib.hm.dag.entryAfter [ "*" ] "allow";
-      };
+      bash =
+        {
+          "*" = lib.hm.dag.entryBefore [
+            "git status*"
+            "git diff*"
+            "git log*"
+            "git show*"
+            "git blame*"
+            "git describe*"
+            "git rev-parse*"
+            "git ls-files*"
+            "git ls-tree*"
+            "git shortlog*"
+            "git remote -v"
+            "git config --get*"
+            "git tag --list*"
+            "git stash list*"
+            "git branch --list*"
+            "git branch -a"
+            "git branch -r"
+            "git commit*"
+            "nix flake check*"
+            "nix flake metadata*"
+            "nix eval*"
+            "nix path-info*"
+            "nix search*"
+            "nix why-depends*"
+            "nix build* --dry-run*"
+            "systemctl status*"
+          ] "ask";
+        }
+        // readOnlyRules
+        // {
+          "git status*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git diff*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git log*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git show*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git blame*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git describe*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git rev-parse*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git ls-files*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git ls-tree*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git shortlog*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git remote -v" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git config --get*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git tag --list*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git stash list*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          # Listing branches is read-only; `git branch -D` deletes and still falls through to "*" = ask.
+          "git branch --list*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git branch -a" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "git branch -r" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          # /commit only drafts the message, never runs git commit.
+          "git commit*" = lib.hm.dag.entryAfter [ "*" ] "deny";
+          "nix flake check*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "nix flake metadata*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "nix eval*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "nix path-info*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "nix search*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "nix why-depends*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "nix build* --dry-run*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+          "systemctl status*" = lib.hm.dag.entryAfter [ "*" ] "allow";
+        };
     };
   };
 
