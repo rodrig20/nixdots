@@ -9,6 +9,7 @@
   hardware.pc = import ./hardware/nixyo.nix;
 
   systemSettings = {
+    btrfs.enable = true;
     boot.enable = true;
     locale.enable = true;
     nix.enable = true;
