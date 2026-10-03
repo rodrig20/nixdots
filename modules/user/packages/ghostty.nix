@@ -13,9 +13,9 @@ in
       settings = {
         "font-size" = 16;
 
-        # Ctrl/Alt + setas movem palavra a palavra. O zsh mapeia \e[b e \e[f
-        # para backward-word/forward-word, mas nao as sequencias xterm 1;5C/D
-        # que os terminais enviam por omissao.
+        # Ctrl/Alt + arrows move word by word. Zsh maps \e[b and \e[f
+        # to backward-word/forward-word, but not the default xterm 1;5C/D
+        # sequences that terminals send.
         keybind = [
           "ctrl+arrow_left=esc:b"
           "ctrl+arrow_right=esc:f"
