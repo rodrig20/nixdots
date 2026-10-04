@@ -10,6 +10,7 @@
 
   systemSettings = {
     btrfs.enable = true;
+    gparted.enable = true;
     boot.enable = true;
     locale.enable = true;
     nix.enable = true;

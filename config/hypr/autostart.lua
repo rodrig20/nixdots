@@ -6,6 +6,9 @@ hl.on("hyprland.start", function ()
     -- Load cursor
     hl.exec_cmd("hyprctl setcursor Bibata-Modern-Classic 28")
 
+    -- Allow local root GUI apps on XWayland for the session.
+    hl.exec_cmd("xhost +SI:localuser:root")
+
     -- Noctalia (systemd user service, supervised by the unit)
     hl.exec_cmd("systemctl --user start noctalia.service")
 

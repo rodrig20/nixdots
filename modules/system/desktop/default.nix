@@ -17,6 +17,8 @@ in
 
     # Privilege escalation UI
     security.polkit.enable = true;
+    # setuid pkexec wrapper for apps that shell out to pkexec (e.g. GParted).
+    security.polkit.enablePkexecWrapper = true;
 
     environment.sessionVariables = {
       # Chromium/Electron Wayland support
