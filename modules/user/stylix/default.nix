@@ -42,6 +42,7 @@ in
       };
       targets.btop.enable = true;
       targets.vscode.enable = true;
+      targets.mpv.enable = true;
     };
   };
 }

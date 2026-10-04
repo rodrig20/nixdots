@@ -6,6 +6,10 @@ lib.mkIf config.userSettings.noctalia.enable {
     polkit_agent = true;
     screen_time_enabled = true;
 
+    screenshot = {
+      directory = "${config.home.homeDirectory}/Pictures/Screenshots";
+    };
+
     settings_window_translucent = true;
 
     launcher.providers = {
