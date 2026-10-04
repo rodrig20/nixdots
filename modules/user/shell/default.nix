@@ -24,7 +24,7 @@ in
         expireDuplicatesFirst = true;
       };
 
-      initExtra = ''
+      initContent = ''
         # Make `/` a word separator
         WORDCHARS=''${WORDCHARS//\/}
         setopt interactivecomments
