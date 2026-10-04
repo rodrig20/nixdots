@@ -14,6 +14,10 @@
     boot.enable = true;
     locale.enable = true;
     nix.enable = true;
+    nh = {
+      enable = true;
+      flake = "/home/rodri/nixdots";
+    };
     vim.enable = true;
     wget.enable = true;
     curl.enable = true;
