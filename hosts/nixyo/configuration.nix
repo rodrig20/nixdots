@@ -50,6 +50,7 @@
     programs.micro.enable = true;
     programs.vscode.enable = true;
     programs.ghostty.enable = true;
+    programs.tmux.enable = true;
     programs.yazi.enable = true;
     programs.zen-browser = {
       enable = true;
