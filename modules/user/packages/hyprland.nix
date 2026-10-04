@@ -27,5 +27,8 @@ in
         animations = hyprdot "animations";
       };
     };
+
+    # xhost for the session autostart grant (root GUI apps on XWayland).
+    home.packages = [ pkgs.xhost ];
   };
 }

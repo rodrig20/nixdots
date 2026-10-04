@@ -1,26 +1,24 @@
-# Stylix user theming from a fixed base16 scheme.
+# Stylix user theming from a fixed base16 scheme (shared, see lib/stylix-theme.nix).
 { config, pkgs, lib, inputs, ... }:
 
 let
   cfg = config.userSettings.stylix;
+  theme = import ../../../lib/stylix-theme.nix;
 in
 {
   options.userSettings.stylix.enable = lib.mkEnableOption "Stylix theming (fixed palette)";
 
   config = lib.mkIf cfg.enable {
     dconf.settings."org/gnome/desktop/interface" = {
-      accent-color = "purple";
+      accent-color = theme.accentColor;
     };
 
     stylix = {
       enable = true;
 
-      # Custom scheme (see ./github-purple.yaml). To use a built-in scheme
-      # instead: "${inputs.tinted-schemes}/base16/<name>.yaml"
-      # (or base24/<name>.yaml)
-      base16Scheme = ./github-purple.yaml;
+      base16Scheme = theme.scheme;
 
-      polarity = "dark";
+      polarity = theme.polarity;
 
       targets.noctalia = {
         enable = true;
@@ -28,18 +26,7 @@ in
         image.enable = false;
       };
 
-      targets.gtk = {
-        enable = true;
-        extraCss = let
-          c = config.lib.stylix.colors.withHashtag;
-        in ''
-          :root {
-            --accent-bg-color: ${c.base0D};
-            --accent-fg-color: ${c.base00};
-            --accent-color: ${c.base0D};
-          }
-        '';
-      };
+      targets.gtk.enable = true;
       targets.qt.enable = true;
       targets.kde.enable = true;
       targets.ghostty.enable = true;
