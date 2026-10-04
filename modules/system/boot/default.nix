@@ -15,5 +15,17 @@ in
     boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto;
 
     boot.tmp.cleanOnBoot = true;
+
+    # Splash screen + silent boot (Esc during boot shows details).
+    boot.plymouth.enable = true;
+    boot.consoleLogLevel = 0;
+    boot.initrd.verbose = false;
+    boot.kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "udev.log_level=3"
+      "rd.systemd.show_status=false"
+    ];
   };
 }

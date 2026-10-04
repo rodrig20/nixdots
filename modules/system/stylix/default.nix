@@ -16,6 +16,7 @@ in
       base16Scheme = ../../../modules/user/stylix/github-purple.yaml;
       overlays.enable = true;
       targets.gnome.enable = true;
+      targets.plymouth.enable = true;
     };
 
     programs.dconf.profiles.gdm.databases = [

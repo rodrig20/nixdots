@@ -11,4 +11,8 @@ lib.mkIf (config.hardware.pc.gpuVendor == "igpu_intel") {
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
   };
+
+  # Early KMS: load the display driver in stage 1 so Plymouth shows
+  # instead of a black screen while the initrd runs (Lunar Lake uses xe).
+  boot.initrd.kernelModules = [ "xe" ];
 }
