@@ -9,9 +9,6 @@ hl.on("hyprland.start", function ()
     -- Allow local root GUI apps on XWayland for the session.
     hl.exec_cmd("xhost +SI:localuser:root")
 
-    -- Noctalia (systemd user service, supervised by the unit)
-    hl.exec_cmd("systemctl --user start noctalia.service")
-
     -- Graphical session target: required by xdg-desktop-portal.service
     -- (Requisite). GDM doesn't activate it for Hyprland; the drop-in in
     -- modules/system/desktop/default.nix allows this manual start.
