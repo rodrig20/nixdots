@@ -64,7 +64,7 @@
     programs.vesktop.enable = true;
     programs.clipboard.enable = true;
     programs.keyring.enable = true;
-    programs.alpaca.enable = true;
+    programs.newelle.enable = true;
     programs.opencode.enable = true;
     programs.opencode.useOllama = true;
     programs.nautilus.enable = true;
