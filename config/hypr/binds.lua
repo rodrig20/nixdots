@@ -86,7 +86,7 @@ hl.bind(mainMod .. " + SHIFT + Z", layout_bind(nil,{ scrolling = hl.dsp.layout("
 hl.bind(mainMod .. " + SHIFT + X", layout_bind(nil,{ scrolling = hl.dsp.layout("consume_or_expel next")}), { description = "Expel if not alone, consume if alone in next column" })
 
 -- Actions & System Controls
-hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"), { description = "Reload Hyprland configuration" })
+hl.bind(mainMod .. " + CTRL + SHIFT + H", hl.dsp.exec_cmd("hyprctl reload"), { description = "Reload Hyprland configuration" })
 
 hl.bind(mainMod .. " + SHIFT + A", function()
     battery_saver = not battery_saver

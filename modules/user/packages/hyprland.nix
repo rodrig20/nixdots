@@ -37,6 +37,9 @@ in
       }
       // lib.optionalAttrs (noctalia.enable && noctalia.plugins.mirror.enable) {
         "noctalia.noctalia-plugins.mirror" = hyprdot "noctalia/noctalia-plugins/mirror";
+      }
+      // lib.optionalAttrs (noctalia.enable && noctalia.plugins.regionRecorder.enable) {
+        "noctalia.noctalia-plugins.region-recorder" = hyprdot "noctalia/noctalia-plugins/region-recorder";
       };
     };
 

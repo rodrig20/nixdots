@@ -11,8 +11,9 @@ hl.bind(mainMod .. " + Period", hl.dsp.exec_cmd("noctalia msg panel-toggle launc
 hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle notifiactions"), { description = "Open Notifications" })
 
 -- Screenshots
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), { description = "Take screenshot of region" })
-hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), { description = "Take fullscreen screenshot" })
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), { description = "Take fullscreen screenshot" })
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), { description = "Take screenshot of region" })
+hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("noctalia msg screenshot-annotate"), { description = "Take screenshot with annotations" })
 
 -- Wallpaper
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"), { description = "Open wallpaper selector" })
