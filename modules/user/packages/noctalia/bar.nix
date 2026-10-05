@@ -13,6 +13,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
           end = [
             "media"
             "group:g3"
+            "group:g7"
             "group:g4"
             "group:g5"
             "group:g6"
@@ -79,13 +80,25 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
               members = [
                 "caffeine"
                 "clipboard"
-                "screenshot"
               ]
-              ++ lib.optional pg.regionRecorder.enable "recorder"
-              ++ lib.optional pg.ocr.enable "ocr"
-              ++ lib.optional pg.colorPicker.enable "color_picker"
               ++ lib.optional pg.mirror.enable "mirror"
               ++ lib.optional pg.warp.enable "warp";
+              opacity = 1.0;
+              padding = 6.0;
+            }
+
+            {
+              accordion = true;
+              accordion_direction = "start";
+              enabled = true;
+              fill = "surface_variant";
+              id = "g7";
+              members = [
+                "screenshot"
+              ]
+              ++ lib.optional pg.colorPicker.enable "color_picker"
+              ++ lib.optional pg.regionRecorder.enable "recorder"
+              ++ lib.optional pg.ocr.enable "ocr";
               opacity = 1.0;
               padding = 6.0;
             }
