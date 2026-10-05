@@ -40,6 +40,9 @@ in
       }
       // lib.optionalAttrs (noctalia.enable && noctalia.plugins.regionRecorder.enable) {
         "noctalia.noctalia-plugins.region-recorder" = hyprdot "noctalia/noctalia-plugins/region-recorder";
+      }
+      // lib.optionalAttrs (noctalia.enable && noctalia.plugins.ocr.enable) {
+        "noctalia.noctalia-plugins.ocr" = hyprdot "noctalia/noctalia-plugins/ocr";
       };
     };
 

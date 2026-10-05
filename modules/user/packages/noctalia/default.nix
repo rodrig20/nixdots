@@ -29,6 +29,11 @@ in
         default = true;
         description = "Region screen recorder plugin.";
       };
+      ocr.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "OCR plugin (grab text from the screen).";
+      };
     };
   };
 
@@ -78,8 +83,16 @@ in
             lib.optionals cfg.plugins.mirror.enable [ "elijaharch/wl-screen-mirror" ]
             ++ lib.optionals cfg.plugins.warp.enable [ "levi/warp" ]
             ++ lib.optionals cfg.plugins.colorPicker.enable [ "oldirtty/color_picker" ]
-            ++ lib.optionals cfg.plugins.regionRecorder.enable [ "h-jangra/region-recorder" ];
+            ++ lib.optionals cfg.plugins.regionRecorder.enable [ "h-jangra/region-recorder" ]
+            ++ lib.optionals cfg.plugins.ocr.enable [ "fel/ocr" ];
           auto_update = "all";
+        };
+
+        # Plugin settings (base layer; GUI edits in settings.toml win).
+        plugin_settings = {
+          "fel/ocr" = {
+            languages = "por+eng";
+          };
         };
 
         theme = {
@@ -103,6 +116,11 @@ in
       userSettings.programs.slurp.enable = lib.mkDefault true;
       userSettings.programs.ffmpeg.enable = lib.mkDefault true;
       userSettings.programs.wl-screenrec.enable = lib.mkDefault true;
+    })
+    (lib.mkIf cfg.plugins.ocr.enable {
+      userSettings.programs.grim.enable = lib.mkDefault true;
+      userSettings.programs.slurp.enable = lib.mkDefault true;
+      userSettings.programs.tesseract.enable = lib.mkDefault true;
     })
   ]);
 }

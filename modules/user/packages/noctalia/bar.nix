@@ -82,6 +82,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
                 "screenshot"
               ]
               ++ lib.optional pg.regionRecorder.enable "recorder"
+              ++ lib.optional pg.ocr.enable "ocr"
               ++ lib.optional pg.colorPicker.enable "color_picker"
               ++ lib.optional pg.mirror.enable "mirror"
               ++ lib.optional pg.warp.enable "warp";
@@ -147,6 +148,13 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
   (lib.mkIf pg.regionRecorder.enable {
     programs.noctalia.settings.widget.recorder = {
       type = "h-jangra/region-recorder:widget";
+    };
+  })
+
+  # OCR: left = OCR selected region, right = OCR focused output.
+  (lib.mkIf pg.ocr.enable {
+    programs.noctalia.settings.widget.ocr = {
+      type = "fel/ocr:ocr";
     };
   })
 ])
