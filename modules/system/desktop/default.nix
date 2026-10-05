@@ -35,8 +35,25 @@ in
 
     xdg.portal = {
       enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
-      config.common.default = [ "hyprland" ];
+      extraPortals = [
+        pkgs.xdg-desktop-portal-hyprland
+        pkgs.xdg-desktop-portal-gtk
+      ];
+      config.common = {
+        default = [ "hyprland" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+      };
+    };
+
+    # Lets the Hyprland autostart hook start graphical-session.target (needed by xdg-desktop-portal.service).
+    systemd.user.targets."graphical-session" = {
+      description = "Current graphical user session";
+      documentation = [ "man:systemd.special(7)" ];
+      requires = [ "basic.target" ];
+      unitConfig = {
+        RefuseManualStart = "no";
+        StopWhenUnneeded = "no";
+      };
     };
   };
 }

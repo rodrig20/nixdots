@@ -76,6 +76,7 @@ lib.mkIf config.userSettings.noctalia.enable {
               "caffeine"
               "clipboard"
               "screenshot"
+              "recorder"
               "color_picker"
               "mirror"
               "warp"
@@ -130,6 +131,11 @@ lib.mkIf config.userSettings.noctalia.enable {
         left = "exec noctalia msg plugin oldirtty/color_picker:service all pick";
         right = "exec noctalia msg panel-toggle oldirtty/color_picker:panel";
       };
+    };
+
+    # Region recorder: left = region select/record toggle, right = fullscreen/stop.
+    widget.recorder = {
+      type = "h-jangra/region-recorder:widget";
     };
   };
 }

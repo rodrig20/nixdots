@@ -12,6 +12,11 @@ hl.on("hyprland.start", function ()
     -- Noctalia (systemd user service, supervised by the unit)
     hl.exec_cmd("systemctl --user start noctalia.service")
 
+    -- Graphical session target: required by xdg-desktop-portal.service
+    -- (Requisite). GDM doesn't activate it for Hyprland; the drop-in in
+    -- modules/system/desktop/default.nix allows this manual start.
+    hl.exec_cmd("systemctl --user start graphical-session.target")
+
     -- Restart portals so they catch the environment
     hl.exec_cmd("systemctl --user stop xdg-desktop-portal xdg-desktop-portal-hyprland")
     hl.exec_cmd("sleep 1 && systemctl --user start xdg-desktop-portal-hyprland xdg-desktop-portal")
