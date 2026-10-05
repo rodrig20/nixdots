@@ -45,6 +45,29 @@ in
         "nav-bar" = [ "uBlock0@raymondhill.net" ];
       };
 
+      # Brave Search as the default search engine.
+      profiles.default.search = {
+        force = true;
+        default = "Brave";
+        engines = {
+          "Brave" = {
+            urls = [
+              {
+                template = "https://search.brave.com/search";
+                params = [
+                  {
+                    name = "q";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            icon = "https://search.brave.com/favicon.ico";
+            definedAliases = [ "@brave" ];
+          };
+        };
+      };
+
       profiles.default.settings =
         {
           # Never auto-offer page translation (manual translation keeps working).
