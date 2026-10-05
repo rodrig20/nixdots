@@ -5,7 +5,32 @@ let
   cfg = config.userSettings.noctalia;
 in
 {
-  options.userSettings.noctalia.enable = lib.mkEnableOption "Noctalia v5 desktop shell";
+  options.userSettings.noctalia = {
+    enable = lib.mkEnableOption "Noctalia v5 desktop shell";
+
+    plugins = {
+      mirror.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "wl-screen-mirror plugin (output mirroring widget).";
+      };
+      warp.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Cloudflare Warp plugin (needs the warp-svc service and a registered client).";
+      };
+      colorPicker.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Color picker plugin.";
+      };
+      regionRecorder.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Region screen recorder plugin.";
+      };
+    };
+  };
 
   imports = [
     ./bar.nix
@@ -19,10 +44,11 @@ in
     ./widgets.nix
   ];
 
-  config = lib.mkIf cfg.enable {
-    programs.noctalia = {
-      enable = true;
-      systemd.enable = true;
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    {
+      programs.noctalia = {
+        enable = true;
+        systemd.enable = true;
 
       settings = {
         accessibility = {
@@ -48,12 +74,11 @@ in
         };
 
         plugins = {
-          enabled = [
-            "elijaharch/wl-screen-mirror" # Needs pkgs.wl-mirror on PATH
-            "levi/warp" # Needs the warp-svc service and a registered client
-            "oldirtty/color_picker" # Needs pkgs.hyprpicker on PATH
-            "h-jangra/region-recorder" # Needs pkgs.slurp, pkgs.ffmpeg and a recorder engine (pkgs.gpu-screen-recorder) on PATH
-          ];
+          enabled =
+            lib.optionals cfg.plugins.mirror.enable [ "elijaharch/wl-screen-mirror" ]
+            ++ lib.optionals cfg.plugins.warp.enable [ "levi/warp" ]
+            ++ lib.optionals cfg.plugins.colorPicker.enable [ "oldirtty/color_picker" ]
+            ++ lib.optionals cfg.plugins.regionRecorder.enable [ "h-jangra/region-recorder" ];
           auto_update = "all";
         };
 
@@ -65,5 +90,19 @@ in
         };
       };
     };
-  };
+  }
+
+    # Use per-tool modules so they keep their config and share a single store path.
+    (lib.mkIf cfg.plugins.mirror.enable {
+      userSettings.programs.wl-mirror.enable = lib.mkDefault true;
+    })
+    (lib.mkIf cfg.plugins.colorPicker.enable {
+      userSettings.programs.hyprpicker.enable = lib.mkDefault true;
+    })
+    (lib.mkIf cfg.plugins.regionRecorder.enable {
+      userSettings.programs.slurp.enable = lib.mkDefault true;
+      userSettings.programs.ffmpeg.enable = lib.mkDefault true;
+      userSettings.programs.wl-screenrec.enable = lib.mkDefault true;
+    })
+  ]);
 }

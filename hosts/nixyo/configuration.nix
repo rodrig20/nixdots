@@ -62,11 +62,6 @@
       uiScale = "1.05";
     };
     programs.vesktop.enable = true;
-    programs.wl-mirror.enable = true;
-    programs.wl-screenrec.enable = true;
-    programs.slurp.enable = true;
-    programs.ffmpeg.enable = true;
-    programs.hyprpicker.enable = true;
     programs.clipboard.enable = true;
     programs.keyring.enable = true;
     programs.alpaca.enable = true;
