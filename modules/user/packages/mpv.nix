@@ -23,12 +23,16 @@ in
         uosc = {
           timeline_style = "bar";
           timeline_size = 4;
-          controls = "menu,gap,subtitles,audio,video,fullscreen,speed,shuffle,loop-playlist,loop-file,gap,prev,play-pause,next,gap,volume";
-          volume_controls = "mute";
-          top_bar_controls = "title,buy,close";
-          window_border = "no";
+          controls = "menu,gap,subtitles,audio,video,space,prev,play-pause,next,speed,space,shuffle,loop-playlist,loop-file,fullscreen";
+          volume = "right";
+          top_bar_controls = "right";
+          top_bar_title = "yes";
+          window_border_size = 0;
           autoload = true;
-          autoload_playlist = true;
+          # Smoother show/hide: longer fades, earlier reveal on approach.
+          animation_duration = 200;
+          proximity_in = 60;
+          proximity_out = 180;
         };
         thumbfast = {
           max_height = 200;
@@ -111,7 +115,7 @@ in
         "n" = "playlist-next";
         "p" = "playlist-prev";
         "H" = "cycle shuffle";
-        "r" = "cycle values loop-file \"inf\" \"no\"";
+        "r" = "cycle-values loop-file inf no";
         "PgUp" = "add chapter 1";
         "PgDwn" = "add chapter -1";
 
