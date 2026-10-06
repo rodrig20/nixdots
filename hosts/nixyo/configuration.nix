@@ -53,6 +53,7 @@
     programs.git.name = "rodrig20";
     programs.git.email = "101592068+rodrig20@users.noreply.github.com";
     programs.micro.enable = true;
+    programs.neovim.enable = true;
     programs.vscode.enable = true;
     programs.ghostty.enable = true;
     programs.tmux.enable = true;
