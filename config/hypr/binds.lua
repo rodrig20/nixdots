@@ -71,9 +71,22 @@ hl.bind(mainMod .. " + W", hl.dsp.window.close(), { description = "Kill active w
 hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd("hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill"), { description = "Force kill active application" })
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Toggle maximize window" })
 hl.bind(mainMod .. " + D", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Toggle fullscreen" })
-hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating" })
-hl.bind(mainMod .. " + ALT + T", function() hl.dispatch(hl.dsp.window.float({ action = "toggle" })); hl.dispatch(hl.dsp.window.pin()) end, { description = "Toggle floating and pinned" })
-hl.bind(mainMod .. " + P", function() hl.dispatch(hl.dsp.window.float({ action = "toggle" })); hl.dispatch(hl.dsp.window.pin()) end, { description = "Toggle floating and pinned" })
+
+function float_toggle_shrink()
+    hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
+    local win = hl.get_active_window()
+    if win and win.floating then
+        local mon = hl.get_active_monitor()
+        if mon then
+            hl.dispatch(hl.dsp.window.resize({ x = math.floor(mon.width * 0.5), y = math.floor(mon.height * 0.5), relative = false }))
+            hl.dispatch(hl.dsp.window.center())
+        end
+    end
+end
+
+hl.bind(mainMod .. " + T", float_toggle_shrink, { description = "Toggle floating" })
+hl.bind(mainMod .. " + ALT + T", function() float_toggle_shrink(); hl.dispatch(hl.dsp.window.pin()) end, { description = "Toggle floating and pinned" })
+hl.bind(mainMod .. " + P", function() float_toggle_shrink(); hl.dispatch(hl.dsp.window.pin()) end, { description = "Toggle floating and pinned" })
 
 -- Layout Splits & Groups
 hl.bind(mainMod .. " + G", hl.dsp.group.toggle(), { description = "Toggle window group" })
@@ -105,9 +118,9 @@ hl.bind(mainMod .. " + SHIFT + A", function()
         hl.config({
             animations = { enabled = true },
             decoration = {
-                active_opacity = 0.8,
-                inactive_opacity = 0.6,
-                fullscreen_opacity = 0.8,
+                active_opacity = 1,
+                inactive_opacity = 0.9,
+                fullscreen_opacity = 1.0,
                 blur = { enabled = true },
                 shadow = { enabled = true }
             }

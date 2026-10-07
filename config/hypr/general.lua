@@ -34,8 +34,8 @@ hl.config({
     },
     decoration = {
         rounding = 10,
-        active_opacity = 0.95,
-        inactive_opacity = 0.8,
+        active_opacity = 1,
+        inactive_opacity = 0.9,
         fullscreen_opacity = 1.0,
 
         blur = {
@@ -55,7 +55,7 @@ hl.config({
         },
         dim_inactive = true,
 		dim_strength = 0.15,
-        dim_special = 0.2
+        dim_special = 0.25
     },
 
     misc = {
@@ -102,6 +102,11 @@ hl.window_rule({
 hl.window_rule({
   match = { float = true, pin = true },
   opaque = true,
+})
+
+hl.window_rule({
+    match = {float = 0 },
+    no_shadow = true
 })
 
 hl.workspace_rule({ workspace = "f[1]", gaps_out = 5, no_border = true})
