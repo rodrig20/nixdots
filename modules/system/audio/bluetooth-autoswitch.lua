@@ -1,4 +1,3 @@
--- Bluetooth auto-switch for WirePlumber.
 
 -- Connected Bluetooth sinks by bound-id.
 tracked_sinks = {}
@@ -102,13 +101,19 @@ function with_metadata (fn)
   end
 end
 
--- Set default sink/source in metadata.
-function set_configured (kind, name)
+-- Set default sink/source: writes configured preference + effective default together.
+function set_default (kind, name)
   with_metadata (function (md)
+    local value = Json.Object { name = name }:to_string ()
     Log.info ("bluetooth-autoswitch: default " .. kind .. " -> " .. tostring (name))
-    md:set (0, "default.configured." .. kind, "Spa:String:JSON",
-        Json.Object { name = name }:to_string ())
+    md:set (0, "default.configured." .. kind, "Spa:String:JSON", value)
+    md:set (0, "default." .. kind, "Spa:String:JSON", value)
   end)
+end
+
+-- Kept for clarity at call sites: preference + effective default together.
+function set_configured (kind, name)
+  set_default (kind, name)
 end
 
 -- Move tracked playback streams to target.
@@ -156,16 +161,21 @@ function on_bt_sink_added (_, node)
   switch_sink (info)
 end
 
--- Forget removed sink, fall back if needed.
+-- Forget removed sink, always recompute fallback so no stale default survives disconnect.
 function on_bt_sink_removed (_, node)
   local id = node ["bound-id"]
-  if not tracked_sinks [id] then
-    return
+  if id ~= nil then
+    tracked_sinks [id] = nil
   end
-  Log.info ("bluetooth-autoswitch: bluetooth sink disconnected")
-  tracked_sinks [id] = nil
+  -- Prune tracked entries that no longer exist anywhere.
+  for tid, _ in pairs (tracked_sinks) do
+    if all_sinks [tid] == nil then
+      tracked_sinks [tid] = nil
+    end
+  end
   local next = find_remaining_bt (tracked_sinks) or find_fallback (all_sinks)
   if next then
+    Log.info ("bluetooth-autoswitch: bluetooth sink disconnected, fallback -> " .. tostring (next.name))
     switch_sink (next)
   end
 end
@@ -184,13 +194,17 @@ end
 -- Forget removed source, fall back if needed.
 function on_bt_source_removed (_, node)
   local id = node ["bound-id"]
-  if not tracked_sources [id] then
-    return
+  if id ~= nil then
+    tracked_sources [id] = nil
   end
-  Log.info ("bluetooth-autoswitch: bluetooth source disconnected")
-  tracked_sources [id] = nil
+  for tid, _ in pairs (tracked_sources) do
+    if all_sources [tid] == nil then
+      tracked_sources [tid] = nil
+    end
+  end
   local next = find_remaining_bt (tracked_sources) or find_fallback (all_sources)
   if next then
+    Log.info ("bluetooth-autoswitch: bluetooth source disconnected, fallback -> " .. tostring (next.name))
     set_configured ("audio.source", next.name)
   end
 end
