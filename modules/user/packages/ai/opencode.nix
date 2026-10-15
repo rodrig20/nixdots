@@ -1,5 +1,5 @@
 # OpenCode AI coding agent.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   cfg = config.userSettings.programs.opencode;
@@ -245,6 +245,24 @@ let
       $ARGUMENTS
     '';
   };
+
+  # https://github.com/ayghri/i-have-adhd: ADHD-friendly output style.
+  iHaveAdhdSrc = inputs.i-have-adhd;
+
+  defaultSkills = {
+    i-have-adhd = inputs.i-have-adhd + "/skills/i-have-adhd";
+    # Official Anthropic skill, on-demand (model loads it for frontend work). No plugin/command/flag needed.
+    frontend-design = inputs.anthropics-skills + "/skills/frontend-design";
+  };
+
+  defaultExtraCommands = {
+    i-have-adhd = iHaveAdhdSrc + "/.opencode/command/i-have-adhd.md";
+  };
+
+  # Upstream OpenCode plugin (V1 1.18.29+ and V2): registers skill + /i-have-adhd command, powers always-on via flag file.
+  defaultPlugins = [
+    (iHaveAdhdSrc + "/.opencode/plugins/i-have-adhd.mjs")
+  ];
 in
 {
   options.userSettings.programs.opencode = {
@@ -277,9 +295,29 @@ in
     };
 
     commands = lib.mkOption {
-      type = lib.types.attrsOf lib.types.lines;
+      type = lib.types.either (lib.types.attrsOf (lib.types.oneOf [
+        lib.types.lines
+        lib.types.path
+        lib.types.str
+      ])) lib.types.path;
       default = { };
-      description = "Extra commands merged over the default /commit and /commit-pt (opencode/commands/).";
+      description = "Extra commands merged over the defaults (/commit, /commit-pt, /i-have-adhd). Accepts inline content or a path to a command file.";
+    };
+
+    skills = lib.mkOption {
+      type = lib.types.either (lib.types.attrsOf (lib.types.oneOf [
+        lib.types.lines
+        lib.types.path
+        lib.types.str
+      ])) lib.types.path;
+      default = { };
+      description = "Extra skills merged over the defaults (i-have-adhd, frontend-design). Accepts inline SKILL.md content or a path to a skill file/directory.";
+    };
+
+    iHaveAdhdAlwaysOn = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Inject the i-have-adhd ruleset on every turn via ~/.config/opencode/.i-have-adhd-always (requires the upstream plugin). Per-session opt-out still works with \"stop adhd mode\" / \"normal mode\". Set to false and rebuild to disable permanently.";
     };
   };
 
@@ -287,10 +325,28 @@ in
     programs.opencode = {
       enable = true;
       extraPackages = [ pkgs.git ] ++ cfg.extraPackages;
-      settings = lib.recursiveUpdate defaultSettings cfg.settings;
+      settings =
+        (lib.recursiveUpdate defaultSettings cfg.settings)
+        // {
+          plugin = defaultPlugins ++ (cfg.settings.plugin or [ ]);
+        };
       tui = cfg.tui;
       context = cfg.context;
-      commands = lib.recursiveUpdate defaultCommands cfg.commands;
+      commands =
+        if builtins.isAttrs cfg.commands then
+          lib.recursiveUpdate (defaultCommands // defaultExtraCommands) cfg.commands
+        else
+          cfg.commands;
+      skills =
+        if builtins.isAttrs cfg.skills then
+          lib.recursiveUpdate defaultSkills cfg.skills
+        else
+          cfg.skills;
+    };
+
+    # Always-on flag read by the upstream plugin every turn. Presence = on; disable via `iHaveAdhdAlwaysOn = false` + rebuild.
+    xdg.configFile."opencode/.i-have-adhd-always" = lib.mkIf cfg.iHaveAdhdAlwaysOn {
+      text = "";
     };
   };
 }

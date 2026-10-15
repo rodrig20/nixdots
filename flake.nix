@@ -44,6 +44,18 @@
       url = "github:tinted-theming/schemes";
       flake = false;
     };
+
+    # ADHD-friendly output style skill for OpenCode.
+    i-have-adhd = {
+      url = "github:ayghri/i-have-adhd";
+      flake = false;
+    };
+
+    # Official Anthropic agent skills collection. Pinned in flake.lock; update with `nix flake update anthropics-skills`.
+    anthropics-skills = {
+      url = "github:anthropics/skills";
+      flake = false;
+    };
   };
 
   outputs =

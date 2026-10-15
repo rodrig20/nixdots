@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "anthropics-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791571549,
+        "narHash": "sha256-+UIqBnzyeIOvJSKYaDaE3GYPEpLw7qQqyUw5S971AfU=",
+        "owner": "anthropics",
+        "repo": "skills",
+        "rev": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "base16": {
       "inputs": {
         "fromYaml": "fromYaml"
@@ -215,6 +231,22 @@
         "type": "github"
       }
     },
+    "i-have-adhd": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791734634,
+        "narHash": "sha256-GTqrnZxQvzo/ogAuUrffkOaMK1BYm/4rAZsnfmDt7DU=",
+        "owner": "ayghri",
+        "repo": "i-have-adhd",
+        "rev": "1ecea1993b7fce257ffbd686c070948b5e07eda6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ayghri",
+        "repo": "i-have-adhd",
+        "type": "github"
+      }
+    },
     "nix-cachyos-kernel": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -331,7 +363,9 @@
     },
     "root": {
       "inputs": {
+        "anthropics-skills": "anthropics-skills",
         "home-manager": "home-manager",
+        "i-have-adhd": "i-have-adhd",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nixpkgs": "nixpkgs_2",
         "noctalia": "noctalia",
