@@ -14,6 +14,7 @@ in
 
   config = lib.mkIf cfg.enable {
     networking.hostName = cfg.hostName;
+    networking.usePredictableInterfaceNames = false;
 
     networking.networkmanager.enable = true;
 
