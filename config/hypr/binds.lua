@@ -21,7 +21,7 @@ end
 -- Applications
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd("ghostty"), { description = "Open the terminal" })
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("zen-browser"), { description = "Open the browser" })
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("nautilus"), { description = "Open the filemanager" })
+hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus --new-window"), { description = "Open the filemanager" })
 
 function workspace_in_group(i)
     local curr = hl.get_active_workspace().id
