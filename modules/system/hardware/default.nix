@@ -32,6 +32,21 @@ in
     hardware.enableRedistributableFirmware = true;
     hardware.graphics.enable = true;
     hardware.graphics.enable32Bit = true;
+
+    # Dynamic linker stub for non-Nix binaries
+    programs.nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        stdenv.cc.cc.lib
+        libGL
+        libx11
+        libxcursor
+        libxi
+        libxinerama
+        libxrandr
+        libxxf86vm
+      ];
+    };
     services.fwupd.enable = true;
     services.udisks2.enable = true;
     hardware.bluetooth.enable = true;
