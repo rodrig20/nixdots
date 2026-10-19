@@ -3,9 +3,6 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("dbus-update-activation-environment --all")
     hl.exec_cmd("dbus-update-activation-environment --systemd GNOME_KEYRING_CONTROL GNOME_KEYRING_PID SSH_AUTH_SOCK")
 
-    -- Load cursor
-    hl.exec_cmd("hyprctl setcursor Bibata-Modern-Classic 28")
-
     -- Allow local root GUI apps on XWayland for the session.
     hl.exec_cmd("xhost +SI:localuser:root")
 

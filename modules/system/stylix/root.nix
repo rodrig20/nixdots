@@ -1,5 +1,5 @@
 # Minimal Stylix profile for root (GTK/Qt) so sudo/polkit GUI apps match the user theme.
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   theme = import ../../../lib/stylix-theme.nix;
@@ -23,6 +23,7 @@ lib.mkIf config.systemSettings.stylix.enable {
       # Same palette as the main user, pinned even if the user customises theirs.
       base16Scheme = theme.scheme;
       polarity = theme.polarity;
+      fonts = theme.fonts pkgs;
 
       targets.gtk.enable = true;
       targets.qt.enable = true;

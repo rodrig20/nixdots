@@ -9,6 +9,7 @@ in
   options.userSettings.stylix.enable = lib.mkEnableOption "Stylix theming (fixed palette)";
 
   config = lib.mkIf cfg.enable {
+    dconf.enable = true;
     dconf.settings."org/gnome/desktop/interface" = {
       accent-color = theme.accentColor;
     };
@@ -20,6 +21,14 @@ in
 
       polarity = theme.polarity;
 
+      fonts = theme.fonts pkgs;
+
+      cursor = {
+        name = "Bibata-Modern-Classic";
+        package = pkgs.bibata-cursors;
+        size = 30;
+      };
+
       targets.noctalia = {
         enable = true;
         opacity.enable = false;
@@ -28,7 +37,6 @@ in
 
       targets.gtk.enable = true;
       targets.qt.enable = true;
-      targets.kde.enable = true;
       targets.ghostty.enable = true;
       targets.hyprland.enable = true;
       targets.opencode.enable = true;
@@ -44,6 +52,12 @@ in
       targets.vscode.enable = true;
       targets.mpv.enable = true;
       targets.neovim.enable = true;
+    };
+
+    # Stylix owns the cursor theme/size; hyprcursor format is still ours.
+    home.pointerCursor.hyprcursor = {
+      enable = true;
+      size = 30;
     };
   };
 }

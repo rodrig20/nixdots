@@ -6,6 +6,14 @@ let
   noctalia = config.userSettings.noctalia;
 
   hyprdot = name: { content = ../../../config/hypr/${name}.lua; };
+
+  cursor =
+    if config.stylix.enable && config.stylix.cursor != null then
+      config.stylix.cursor
+    else
+      null;
+  cursorSize = if cursor != null then toString cursor.size else "24";
+  cursorName = if cursor != null then cursor.name else "Bibata-Modern-Classic";
 in
 {
   options.userSettings.programs.hyprland.enable = lib.mkEnableOption "hyprland dotfiles";
@@ -16,6 +24,14 @@ in
       configType = "lua";
       package = pkgs.hyprland;
       systemd.enable = false;
+
+      # Hyprland 0.56: no cursor.size option — size is env-only.
+      settings.env = [
+        { _args = [ "XCURSOR_SIZE" cursorSize ]; }
+        { _args = [ "XCURSOR_THEME" cursorName ]; }
+        { _args = [ "HYPRCURSOR_SIZE" cursorSize ]; }
+        { _args = [ "HYPRCURSOR_THEME" cursorName ]; }
+      ];
 
       extraLuaFiles = {
         monitors = hyprdot "monitors";

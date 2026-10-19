@@ -11,8 +11,6 @@ in
     programs.ghostty = {
       enable = true;
       settings = {
-        "font-size" = 16;
-
         # Two-level word navigation: plain Alt stops at `/` (WORDCHARS
         # is trimmed in shell/default.nix), Alt+Shift covers whole paths
         # via custom zsh widgets bound to the sequences below.

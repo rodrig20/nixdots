@@ -77,7 +77,6 @@
     programs.fastfetch.enable = true;
     programs.direnv.enable = true;
     xdg.enable = true;
-    theme.enable = true;
     stylix.enable = true;
     programs.hyprland.enable = true;
     noctalia.enable = true;

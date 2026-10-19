@@ -14,6 +14,7 @@ in
       # Shared palette, see lib/stylix-theme.nix.
       base16Scheme = theme.scheme;
       polarity = theme.polarity;
+      fonts = theme.fonts pkgs;
       overlays.enable = true;
       targets.gnome.enable = true;
       targets.plymouth.enable = true;
