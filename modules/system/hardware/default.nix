@@ -31,6 +31,7 @@ in
   config = lib.mkIf cfg.enable {
     hardware.enableRedistributableFirmware = true;
     hardware.graphics.enable = true;
+    hardware.graphics.enable32Bit = true;
     services.fwupd.enable = true;
     services.udisks2.enable = true;
     hardware.bluetooth.enable = true;

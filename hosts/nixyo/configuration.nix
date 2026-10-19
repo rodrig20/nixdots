@@ -72,6 +72,7 @@
     programs.onlyoffice.enable = true;
     programs.loupe.enable = true;
     programs.mpv.enable = true;
+    programs.hydra.enable = true;
     programs.pavucontrol.enable = true;
     programs.fastfetch.enable = true;
     programs.direnv.enable = true;
