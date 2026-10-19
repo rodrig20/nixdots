@@ -14,6 +14,12 @@ in
       options = "--delete-older-than 30d";
     };
 
+    # Dedup store hardlinks weekly (NVMe, cheap).
+    nix.optimise = {
+      automatic = true;
+      dates = [ "weekly" ];
+    };
+
     nix.settings = {
       experimental-features = [ "nix-command" "flakes" ];
       max-jobs = "auto";
