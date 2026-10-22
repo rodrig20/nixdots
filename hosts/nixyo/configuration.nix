@@ -43,6 +43,8 @@
     virtualisation.podman.enable = true;
     virtualisation.libvirt.enable = true;
     ollama.enable = true;
+
+    agenix.enable = true;
   };
 
   home-manager.users.rodri.userSettings = {

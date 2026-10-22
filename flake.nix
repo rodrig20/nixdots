@@ -21,6 +21,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -98,6 +103,7 @@
                 home-manager.backupFileExtension = "bak";
                 home-manager.overwriteBackup = true;
                 home-manager.extraSpecialArgs = { inherit inputs; };
+                home-manager.sharedModules = [ inputs.agenix.homeManagerModules.default ];
               }
 
               inputs.stylix.nixosModules.stylix
