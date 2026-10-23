@@ -82,5 +82,13 @@
     stylix.enable = true;
     programs.hyprland.enable = true;
     noctalia.enable = true;
+    programs.rclone = {
+      enable = true;
+      # Remote pre-configured in the module
+      remotes.gdrive = {
+        enable = true;
+        mountPoint = "/home/rodri/gdrive";
+      };
+    };
   };
 }

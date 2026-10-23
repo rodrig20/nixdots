@@ -19,8 +19,8 @@ in
     };
   };
 
-  # Without this, HM agenix falls back to its defaults (the GitHub key ~/.ssh/id_ed25519, absent from the rules).
+  # Home Manager decrypts with the agenix SSH key only.
   config = lib.mkIf cfg.enable {
-    home-manager.users.${config.systemSettings.users.name}.age.identityPaths = [ cfg.identityPath ];
+    home-manager.users.${config.systemSettings.users.name}.age.identityPaths = lib.mkForce [ cfg.identityPath ];
   };
 }
