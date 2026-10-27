@@ -35,8 +35,8 @@ in
 
     xdg.portal = {
       enable = true;
+      # hyprland portal is added automatically by programs.hyprland.enable
       extraPortals = [
-        pkgs.xdg-desktop-portal-hyprland
         pkgs.xdg-desktop-portal-gtk
       ];
       config.common = {

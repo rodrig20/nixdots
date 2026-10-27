@@ -19,7 +19,6 @@ in
     # Splash screen + silent boot (Esc during boot shows details).
     boot.plymouth.enable = true;
     boot.consoleLogLevel = 0;
-    boot.initrd.verbose = false;
     boot.kernelParams = [
       "quiet"
       "splash"
