@@ -263,12 +263,31 @@ let
   defaultPlugins = [
     (iHaveAdhdSrc + "/.opencode/plugins/i-have-adhd.mjs")
   ];
+
+  # OpenRouter key from agenix secret (decrypted at activation). Fallback to openrouterApiKey option.
+  openrouterSecretKey = lib.optionalAttrs (
+    config ? age && config.age ? secrets && builtins.hasAttr "openrouter-api-key" config.age.secrets
+  ) {
+    value = builtins.readFile config.age.secrets.openrouter-api-key.path;
+  };
 in
 {
   options.userSettings.programs.opencode = {
     enable = lib.mkEnableOption "OpenCode";
 
     useOllama = lib.mkEnableOption "Ollama (local) provider for OpenCode";
+
+    openrouterApiKey = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "OpenRouter API key. Falls back to agenix secret secrets/openrouter-api-key.age if set.";
+    };
+
+    cli = lib.mkOption {
+      type = lib.types.attrs;
+      default = { theme = { name = "stylix"; mode = "system"; }; };
+      description = "CLI-specific config (OpenCode 2 cli.json): terminal client settings (theme, keybinds).";
+    };
 
     settings = lib.mkOption {
       type = lib.types.attrs;
@@ -322,6 +341,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    age.secrets.openrouter-api-key = {
+      file = ../../../../secrets/openrouter-api-key.age;
+    };
     programs.opencode = {
       enable = true;
       extraPackages = [ pkgs.git ] ++ cfg.extraPackages;
@@ -329,7 +351,20 @@ in
         (lib.recursiveUpdate defaultSettings cfg.settings)
         // {
           plugin = defaultPlugins ++ (cfg.settings.plugin or [ ]);
+        }
+        // lib.optionalAttrs (openrouterSecretKey ? null && openrouterSecretKey.value != null) {
+          provider = {
+            openrouter = {
+              npm = "@ai-sdk/openai-compatible";
+              name = "OpenRouter";
+              options = {
+                baseURL = "https://openrouter.ai/api/v1";
+                apiKey = openrouterSecretKey.value or cfg.openrouterApiKey;
+              };
+            };
+          };
         };
+      cli = cfg.cli;
       tui = cfg.tui;
       context = cfg.context;
       commands =
