@@ -38,6 +38,7 @@
     hardware.enable = true;
     hardware.conservation-mode.enable = true;
     keyring.enable = true;
+    gaze.enable = true;
     desktop.enable = true;
     stylix.enable = true;
     fonts.enable = true;

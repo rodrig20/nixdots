@@ -222,6 +222,27 @@
         "type": "github"
       }
     },
+    "gaze": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793003772,
+        "narHash": "sha256-7Se9g29apzFHy6Q5qeeIIJuVKnCSFb35QgQ0HnwUFmk=",
+        "owner": "GunduLabs",
+        "repo": "gaze",
+        "rev": "4cc4451ced42bf062386810a6fc1df5c5135aac9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GunduLabs",
+        "ref": "v0.4.1",
+        "repo": "gaze",
+        "type": "github"
+      }
+    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -462,6 +483,7 @@
       "inputs": {
         "agenix": "agenix",
         "anthropics-skills": "anthropics-skills",
+        "gaze": "gaze",
         "home-manager": "home-manager",
         "i-have-adhd": "i-have-adhd",
         "lanzaboote": "lanzaboote",
