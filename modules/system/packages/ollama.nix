@@ -28,6 +28,8 @@ in
       port = 11434;
       environmentVariables = {
         OLLAMA_KEEP_ALIVE = "30m";
+        # Default context window (num_ctx) for all models
+        OLLAMA_CONTEXT_LENGTH = "102400";
       }
       // lib.optionalAttrs isIntelIGpu {
         OLLAMA_VULKAN = "1";
