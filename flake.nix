@@ -72,6 +72,12 @@
       url = "github:anthropics/skills";
       flake = false;
     };
+
+    # Google Antigravity CLI and apps
+    antigravity-nix = {
+      url = "github:jacopone/antigravity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

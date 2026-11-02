@@ -72,6 +72,7 @@
     programs.newelle.enable = true;
     programs.opencode.enable = true;
     programs.opencode.useOllama = true;
+    programs.antigravity-cli.enable = true;
     programs.nautilus.enable = true;
     programs.onlyoffice.enable = true;
     programs.loupe.enable = true;
