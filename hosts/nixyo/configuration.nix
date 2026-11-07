@@ -34,7 +34,7 @@
     users.enable = true;
     users.name = "rodri";
     users.description = "Rodrigo";
-    users.extraGroups = [ "networkmanager" "wheel" "render" "video" "audio" ];
+    users.extraGroups = [ "networkmanager" "wheel" "render" "video" "audio" "dialout"];
     hardware.enable = true;
     hardware.conservation-mode.enable = true;
     keyring.enable = true;
