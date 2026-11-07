@@ -24,11 +24,13 @@ in
       experimental-features = [ "nix-command" "flakes" ];
       max-jobs = "auto";
       substituters = [
+        "https://cache.lantian.pub/lantian"
         "https://cache.nixos.org"
         "https://noctalia.cachix.org"
         "https://cache.xinux.uz"
       ];
       trusted-public-keys = [
+        "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
         "cache.xinux.uz:BXCrtqejFjWzWEB9YuGB7X2MV4ttBur1N8BkwQRdH+0="
@@ -40,5 +42,11 @@ in
     nix.daemonIOSchedPriority = 7;
 
     nixpkgs.config.allowUnfree = true;
+
+    # Temporarily allow gtk2 evaluation: onlyoffice-desktopeditors still depends on
+    # gtk2, which is marked broken ahead of its removal in NixOS 27.05
+    # (https://github.com/NixOS/nixpkgs/issues/410814). Drop this once OnlyOffice
+    # migrates to gtk3/gtk4.
+    nixpkgs.config.problems.handlers."gtk+".broken = "warn";
   };
 }

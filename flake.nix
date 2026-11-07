@@ -5,6 +5,7 @@
   nixConfig = {
     extra-substituters = [
       "https://noctalia.cachix.org"
+      "https://cache.lantian.pub/lantian"
       "https://cache.xinux.uz"
     ];
     extra-trusted-public-keys = [
