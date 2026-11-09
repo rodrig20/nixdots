@@ -6,10 +6,19 @@
 #   3. sudo gaze keyring
 #
 # Until enrolled, sudo and GDM fall back to your password.
-{ config, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   cfg = config.systemSettings.gaze;
+
+  system = pkgs.stdenv.hostPlatform.system;
+
+  # nixpkgs' cargo-setup-hook sets ZSTD_SYS_USE_PKG_CONFIG=1, so Rust crates
+  # vendoring zstd-sys must link against a system libzstd. Upstream's packaging
+  # doesn't ship one; remove this once gaze adds zstd to its buildInputs.
+  patchZstd = p: p.overrideAttrs (old: {
+    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.zstd ];
+  });
 in
 {
   options.systemSettings.gaze.enable =
@@ -22,6 +31,12 @@ in
   config = lib.mkIf cfg.enable {
     services.gaze = {
       enable = true;
+
+      # Patch packages for the zstd-sys pkg-config requirement (see patchZstd).
+      package = patchZstd inputs.gaze.packages.${system}.gaze;
+      gui = {
+        package = patchZstd inputs.gaze.packages.${system}.gaze-gui;
+      };
 
       # Upstream default is [ "sudo" "polkit-1" ]; keep only sudo.
       pam.defaultServices = [ "sudo" ];

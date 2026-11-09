@@ -158,8 +158,16 @@ let
     commit = {
       description = "Draft a conventional commit message from the staged diff";
       prompt = ''
-        Inspect `git status` and `git diff --staged`, plus `git log --oneline -5` for this repo's recent style.
-        Draft ONE conventional commit message: `<type>(<scope>?): <short description>`.
+        Repository state (output included below):
+
+        !{git status --short}
+        !{git diff --staged}
+
+        Recent style:
+
+        !{git log --oneline -5}
+
+        From the output above, draft ONE conventional commit message: `<type>(<scope>?): <short description>`.
         Types: feat, fix, docs, style, refactor, perf, test, chore. Keep it short, no trailing period,
         no body unless {{args}} asks for one.
         Reply with ONLY the message. Never run `git commit` or `git add`.
@@ -170,8 +178,16 @@ let
     commit-pt = {
       description = "Escreve uma mensagem de commit convencional a partir do staged diff";
       prompt = ''
-        Inspeciona `git status` e `git diff --staged`, mais `git log --oneline -5` para apanhar o estilo recente do repo.
-        Escreve UMA mensagem conventional-commits: `<tipo>(<scope>?): <descrição curta em português europeu>`.
+        Estado do repositório (output incluído abaixo):
+
+        !{git status --short}
+        !{git diff --staged}
+
+        Estilo recente:
+
+        !{git log --oneline -5}
+
+        A partir do output acima, escreve UMA mensagem conventional-commits: `<tipo>(<scope>?): <descrição curta em português europeu>`.
         Tipos (em inglês): feat, fix, docs, style, refactor, perf, test, chore. Curta, sem ponto final,
         sem corpo a menos que {{args}} peça um.
         Responde SÓ com a mensagem. Nunca executes `git commit` nem `git add`.
