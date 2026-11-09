@@ -23,6 +23,7 @@
     wget.enable = true;
     curl.enable = true;
     jq.enable = true;
+    tldr.enable = true;
     btop.enable = true;
     pciutils.enable = true;
     unzip.enable = true;
