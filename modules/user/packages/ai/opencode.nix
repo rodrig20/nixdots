@@ -285,7 +285,12 @@ in
 
     cli = lib.mkOption {
       type = lib.types.attrs;
-      default = { theme = { name = "stylix"; mode = "system"; }; };
+      default = {
+        theme = { name = "stylix"; mode = "system"; };
+
+        # Per-session sidebar off by default
+        session.sidebar = "hide";
+      };
       description = "CLI-specific config (OpenCode 2 cli.json): terminal client settings (theme, keybinds).";
     };
 
