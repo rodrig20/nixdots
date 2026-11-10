@@ -13,9 +13,17 @@ let
 
   system = pkgs.stdenv.hostPlatform.system;
 
-  # nixpkgs' cargo-setup-hook sets ZSTD_SYS_USE_PKG_CONFIG=1, so Rust crates
-  # vendoring zstd-sys must link against a system libzstd. Upstream's packaging
-  # doesn't ship one; remove this once gaze adds zstd to its buildInputs.
+  # WORKAROUND: gaze-zstd
+  #   why:          nixpkgs' cargo-setup-hook sets ZSTD_SYS_USE_PKG_CONFIG=1, so
+  #                 zstd-sys must link a system libzstd via pkg-config. Gaze's
+  #                 packaging doesn't include one, so the unpatched build panics:
+  #                 "The system library `libzstd` required by crate `zstd-sys`
+  #                 was not found."
+  #   issue:        -
+  #   added:        2026-11-09 (f595775)
+  #   remove-when:  gaze ships zstd in its buildInputs upstream (GunduLabs/gaze)
+  #   test:         cd /home/rodri/nixdots && nix build --no-link "$(nix eval --impure --raw --expr 'let f = builtins.getFlake (toString ./.); in f.inputs.gaze.packages.x86_64-linux.gaze.drvPath')^out"
+  #                 exit 1 = ainda é preciso; exit 0 = remover patchZstd por inteiro
   patchZstd = p: p.overrideAttrs (old: {
     buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.zstd ];
   });

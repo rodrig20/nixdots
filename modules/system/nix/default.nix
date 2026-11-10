@@ -42,11 +42,5 @@ in
     nix.daemonIOSchedPriority = 7;
 
     nixpkgs.config.allowUnfree = true;
-
-    # Temporarily allow gtk2 evaluation: onlyoffice-desktopeditors still depends on
-    # gtk2, which is marked broken ahead of its removal in NixOS 27.05
-    # (https://github.com/NixOS/nixpkgs/issues/410814). Drop this once OnlyOffice
-    # migrates to gtk3/gtk4.
-    nixpkgs.config.problems.handlers."gtk+".broken = "warn";
   };
 }
