@@ -282,6 +282,36 @@ let
     (iHaveAdhdSrc + "/.opencode/plugins/i-have-adhd.mjs")
   ];
 
+  # YOLOOO: same as the built-in `build` agent (no `system` prompt, so it keeps the base prompt),
+  # but every permission rule ends in `allow`, so nothing ever asks for approval.
+  # Rules append in order and the last match wins: the blanket allow is followed by the few
+  # `deny` rules `build` still has (`.env` files, `git commit`), which are therefore preserved.
+  # No body on purpose: a non-empty body would replace the base system prompt.
+  defaultAgents = {
+    YOLOOO = ''
+      ---
+      description: Same as build, but never asks for permission
+      mode: primary
+      permissions:
+        - action: "*"
+          resource: "*"
+          effect: allow
+        - action: read
+          resource: "*.env"
+          effect: deny
+        - action: read
+          resource: "*.env.*"
+          effect: deny
+        - action: read
+          resource: "*.env.example"
+          effect: allow
+        - action: shell
+          resource: "git commit*"
+          effect: deny
+      ---
+    '';
+  };
+
   # OpenRouter key from agenix secret (decrypted at activation). Fallback to openrouterApiKey option.
   openrouterSecretKey = lib.optionalAttrs (
     config ? age && config.age ? secrets && builtins.hasAttr "openrouter-api-key" config.age.secrets
@@ -356,6 +386,16 @@ in
       description = "Extra skills merged over the defaults (i-have-adhd, frontend-design). Accepts inline SKILL.md content or a path to a skill file/directory.";
     };
 
+    agents = lib.mkOption {
+      type = lib.types.either (lib.types.attrsOf (lib.types.oneOf [
+        lib.types.lines
+        lib.types.path
+        lib.types.str
+      ])) lib.types.path;
+      default = { };
+      description = "Extra agents merged over the defaults (YOLOOO: build without permission prompts). Accepts inline Markdown agent content or a path to an agent file/directory.";
+    };
+
     iHaveAdhdAlwaysOn = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -400,6 +440,11 @@ in
           lib.recursiveUpdate defaultSkills cfg.skills
         else
           cfg.skills;
+      agents =
+        if builtins.isAttrs cfg.agents then
+          lib.recursiveUpdate defaultAgents cfg.agents
+        else
+          cfg.agents;
     };
 
     # Always-on flag read by the upstream plugin every turn. Presence = on; disable via `iHaveAdhdAlwaysOn = false` + rebuild.
