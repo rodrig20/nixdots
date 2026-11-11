@@ -27,7 +27,7 @@ lib.mkIf config.userSettings.noctalia.enable {
       type = "login_box";
 
       settings = {
-        background_color = "surface_variant";
+        background_color = "surface_container";
         background_opacity = 0.88;
         background_radius = 12.0;
 

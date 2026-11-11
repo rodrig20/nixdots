@@ -34,7 +34,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
             {
               accordion = false;
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g6";
               members = [
                 "battery"
@@ -47,7 +47,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
             {
               accordion = false;
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g5";
               members = [
                 "network"
@@ -60,7 +60,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
             {
               accordion = false;
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g4";
               members = [
                 "brightness"
@@ -75,7 +75,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
               accordion = true;
               accordion_direction = "start";
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g3";
               members = [
                 "caffeine"
@@ -91,7 +91,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
               accordion = true;
               accordion_direction = "start";
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g7";
               members = [
                 "screenshot"
@@ -106,7 +106,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
             {
               accordion = false;
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g2";
               members = [
                 "sysmon"
@@ -119,7 +119,7 @@ lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
             {
               accordion = false;
               enabled = true;
-              fill = "surface_variant";
+              fill = "surface_container";
               id = "g1";
               members = [
                 "launcher"
