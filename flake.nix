@@ -33,7 +33,7 @@
     };
 
     gaze = {
-      url = "github:GunduLabs/gaze/v0.4.1";
+      url = "github:GunduLabs/gaze/v0.5.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
