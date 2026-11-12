@@ -7,5 +7,6 @@ in
 {
   "secrets/rclone-gdrive-client-secret.age".publicKeys = [ age ];
   "secrets/rclone-gdrive-token.age".publicKeys = [ age ];
+  "secrets/rclone-gcrypt-password.age".publicKeys = [ age ];
   "secrets/openrouter-api-key.age".publicKeys = [ age ];
 }

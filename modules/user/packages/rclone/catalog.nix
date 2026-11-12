@@ -17,4 +17,16 @@
       client_secret = ../../../../secrets/rclone-gdrive-client-secret.age;
     };
   };
+
+  userSettings.programs.rclone.remotes.gcrypt = {
+    config = {
+      type = "crypt";
+      remote = "gdrive:.crypt";
+      filename_encryption = "standard";
+      directory_name_encryption = true;
+    };
+    secrets = {
+      password = ../../../../secrets/rclone-gcrypt-password.age;
+    };
+  };
 }

@@ -90,7 +90,24 @@
       # Remote pre-configured in the module
       remotes.gdrive = {
         enable = true;
-        mountPoint = "/home/rodri/gdrive";
+        mountPoint = "/home/rodri/Cloud/gdrive";
+        mountOptions = {
+          exclude = ".crypt";
+          cache-dir = "/home/rodri/.cache/rclone/gdrive";
+          vfs-cache-mode = "writes";
+          vfs-cache-max-age = "1h";
+          vfs-write-back = "5s";
+        };
+      };
+      remotes.gcrypt = {
+        enable = true;
+        mountPoint = "/home/rodri/Cloud/gcrypt";
+        mountOptions = {
+          cache-dir = "/home/rodri/.cache/rclone/gcrypt";
+          vfs-cache-mode = "writes";
+          vfs-cache-max-age = "1h";
+          vfs-write-back = "5s";
+        };
       };
     };
   };
