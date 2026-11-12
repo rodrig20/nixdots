@@ -39,7 +39,16 @@
     hardware.enable = true;
     hardware.conservation-mode.enable = true;
     keyring.enable = true;
-    gaze.enable = true;
+    gaze = {
+      enable = true;
+      camera = {
+        rgb = "usb:174f:11b3";
+        ir = "usb:174f:11b3";
+        parallelCapture = "auto";
+      };
+      security.level = "high";
+      liveness.enabled = true;
+    };
     desktop.enable = true;
     stylix.enable = true;
     fonts.enable = true;
