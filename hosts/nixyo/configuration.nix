@@ -11,8 +11,11 @@
   systemSettings = {
     btrfs.enable = true;
     gparted.enable = true;
-    boot.enable = true;
-    boot.secureboot.enable = true;
+    boot = {
+      enable = true;
+      kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v3;
+      secureboot.enable = true;
+    };
     locale.enable = true;
     nix.enable = true;
     nh = {
