@@ -3,7 +3,7 @@
 
 let
   cfg = config.userSettings.programs.hyprland;
-  noctalia = config.userSettings.noctalia;
+  noctalia = config.userSettings.programs.noctalia;
 
   hyprdot = name: { content = ../../../config/hypr/${name}.lua; };
 

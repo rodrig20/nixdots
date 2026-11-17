@@ -107,6 +107,7 @@
       fastfetch.enable = true;
       direnv.enable = true;
       hyprland.enable = true;
+      noctalia.enable = true;
       rclone = {
         enable = true;
         # Remote pre-configured in the module
@@ -137,6 +138,5 @@
     };
     xdg.enable = true;
     stylix.enable = true;
-    noctalia.enable = true;
   };
 }

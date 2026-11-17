@@ -1,9 +1,9 @@
 { config, pkgs, lib, ... }:
 
 let
-  pg = config.userSettings.noctalia.plugins;
+  pg = config.userSettings.programs.noctalia.plugins;
 in
-lib.mkIf config.userSettings.noctalia.enable (lib.mkMerge [
+lib.mkIf config.userSettings.programs.noctalia.enable (lib.mkMerge [
   {
     programs.noctalia.settings = {
       bar = {

@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 
-lib.mkIf config.userSettings.noctalia.enable {
+lib.mkIf config.userSettings.programs.noctalia.enable {
   programs.noctalia.settings.desktop_widgets = {
     schema_version = 2;
 

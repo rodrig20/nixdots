@@ -1,7 +1,7 @@
 # Session panel: the default actions plus Hibernate.
 { config, pkgs, lib, ... }:
 
-lib.mkIf config.userSettings.noctalia.enable {
+lib.mkIf config.userSettings.programs.noctalia.enable {
   programs.noctalia.settings.shell.session.actions = [
     {
       action = "lock";

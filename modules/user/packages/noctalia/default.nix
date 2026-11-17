@@ -2,10 +2,10 @@
 { config, pkgs, lib, ... }:
 
 let
-  cfg = config.userSettings.noctalia;
+  cfg = config.userSettings.programs.noctalia;
 in
 {
-  options.userSettings.noctalia = {
+  options.userSettings.programs.noctalia = {
     enable = lib.mkEnableOption "Noctalia v5 desktop shell";
 
     plugins = {
