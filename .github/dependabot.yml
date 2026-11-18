@@ -1,0 +1,15 @@
+# Dependabot: auto-update GitHub Actions versions used in workflows.
+# Runs weekly; opens PRs when new versions of actions/* are released.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Lisbon"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"

@@ -1,5 +1,7 @@
-# Daily flake.lock refresh: update inputs, build every host's toplevel,
-# and only commit back to main when the build succeeds.
+# flake.lock + flake.nix refresh: update inputs, build, bump version tags,
+# rebuild, scan runtime closure for CVEs, and commit only when everything passes.
+# Order: flake update -> build -> bump versions -> build -> vulnix -> commit.
+# If either build fails, the job stops with a log and nothing is committed.
 name: Update flake inputs
 
 on:
@@ -25,26 +27,82 @@ jobs:
       - name: Update inputs
         run: nix flake update
 
-      - name: Check for changes
-        id: diff
-        run: |
-          if git diff --quiet -- flake.lock; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            git --no-pager diff --stat -- flake.lock
-          fi
-
-      # Always build and scan
-      - name: Build every host
+      # First build: validates the flake.lock update.
+      # Failure stops the job here: no bump, no scan, no commit.
+      - name: Build (after flake update)
+        id: build1
         run: |
           : > "$RUNNER_TEMP/out-paths.txt"
+          : > "$RUNNER_TEMP/build1.log"
           for host in hosts/*/; do
             host="$(basename "$host")"
             echo "building nixosConfigurations.$host"
+            # stdout (out paths) -> out-paths.txt, stderr (build log) -> build1.log
             nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" \
               --no-link --print-out-paths --accept-flake-config \
-              >> "$RUNNER_TEMP/out-paths.txt"
+              >> "$RUNNER_TEMP/out-paths.txt" \
+              2> >(tee -a "$RUNNER_TEMP/build1.log" >&2)
+          done
+
+      # Bump flake input version tags (e.g. lanzaboote/v1.2.0 -> v1.3.0).
+      # Only touches inputs whose URL matches github:owner/repo/vX.Y.Z.
+      # Queries the GitHub API for the latest tag on each matching repo.
+      - name: Bump input versions
+        id: bump
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bumped=false
+
+          # Unique github:owner/repo/vX.Y.Z URLs found in flake.nix
+          # (|| true: no matches must not fail the step under `set -e`)
+          urls=$(grep -oE 'github:[^"]+/v[0-9]+\.[0-9]+\.[0-9]+' flake.nix | sort -u || true)
+
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            repo=$(echo "$url" | sed 's|^github:||; s|/v[0-9.]*$||')
+            current_tag=$(echo "$url" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$')
+
+            # Latest stable vX.Y.Z tag on that repo. The API order is not
+            # semver-sorted, so collect all tags, keep only stable versions
+            # (skip RCs/nightlies) and sort numerically. Empty if none/API fails.
+            latest_tag=$(gh api "repos/$repo/tags" --jq '.[].name' 2>/dev/null \
+              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)
+            [ -z "$latest_tag" ] && continue
+            [ "$latest_tag" = "$current_tag" ] && continue
+
+            # Only bump if latest_tag is actually newer (sort -V)
+            newest=$(printf '%s\n%s\n' "$current_tag" "$latest_tag" | sort -V | tail -1)
+            if [ "$newest" = "$latest_tag" ]; then
+              echo "Bumping $repo: $current_tag -> $latest_tag"
+              # Replace the full URL to avoid touching other inputs with the same tag
+              sed -i "s|github:$repo/$current_tag|github:$repo/$latest_tag|g" flake.nix
+              bumped=true
+            fi
+          done <<< "$urls"
+
+          if [ "$bumped" = true ]; then
+            echo "Updating lock for bumped inputs..."
+            nix flake update
+          fi
+
+          echo "bumped=$bumped" >> "$GITHUB_OUTPUT"
+
+      # Second build: validates the version bumps.
+      # Failure stops the job: no scan, no commit (bumped flake.nix is discarded).
+      - name: Build (after bump)
+        id: build2
+        run: |
+          : > "$RUNNER_TEMP/out-paths.txt"
+          : > "$RUNNER_TEMP/build2.log"
+          for host in hosts/*/; do
+            host="$(basename "$host")"
+            echo "building nixosConfigurations.$host"
+            # stdout (out paths) -> out-paths.txt, stderr (build log) -> build2.log
+            nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" \
+              --no-link --print-out-paths --accept-flake-config \
+              >> "$RUNNER_TEMP/out-paths.txt" \
+              2> >(tee -a "$RUNNER_TEMP/build2.log" >&2)
           done
 
       # Report-only: scan the runtime closure for CVEs. Exit codes:
@@ -144,17 +202,66 @@ jobs:
                 echo "::warning::vulnix found $total_count vulnerabilities on $host ($crit_count critical)"
               fi
               echo ""
+              # Raw vulnix log, collapsed (the full log is always available
+              # even when no build failed).
+              echo "<details>"
+              echo "<summary>📜 vulnix log ($host)</summary>"
+              echo ""
+              echo '```'
+              cat "$tmp"
+              echo '```'
+              echo ""
+              echo "</details>"
+              echo ""
             } >> "$summary"
           done < "$RUNNER_TEMP/out-paths.txt"
 
           cat "$summary" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit and push
-        if: steps.diff.outputs.changed == 'true'
         run: |
+          if git diff --quiet -- flake.lock flake.nix; then
+            echo "No changes to commit."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add flake.lock
-          git commit -m "chore: update flake.lock (auto)"
+          git add flake.lock flake.nix
+          if [ "${{ steps.bump.outputs.bumped }}" = "true" ]; then
+            git commit -m "chore: update flake inputs and bump versions (auto)"
+          else
+            git commit -m "chore: update flake.lock (auto)"
+          fi
           git pull --rebase origin main
           git push
+
+      # On failure, write a clear message plus the actual build error log
+      # to the job summary.
+      - name: Report failure
+        if: failure()
+        run: |
+          {
+            echo "## ❌ Workflow failed"
+            echo ""
+            if [ "${{ steps.build1.outcome }}" = "failure" ]; then
+              echo "**Build after \`nix flake update\` failed** — nothing was committed."
+              echo ""
+              echo "Last 80 lines of the build log:"
+              echo ""
+              echo '```'
+              tail -n 80 "$RUNNER_TEMP/build1.log" 2>/dev/null || echo "(no log captured)"
+              echo '```'
+            elif [ "${{ steps.bump.outcome }}" = "failure" ]; then
+              echo "**Version bump failed** — see the **Bump input versions** step logs above."
+            elif [ "${{ steps.build2.outcome }}" = "failure" ]; then
+              echo "**Build after version bump failed** — the \`flake.nix\` bump was **not** committed."
+              echo ""
+              echo "Last 80 lines of the build log:"
+              echo ""
+              echo '```'
+              tail -n 80 "$RUNNER_TEMP/build2.log" 2>/dev/null || echo "(no log captured)"
+              echo '```'
+            else
+              echo "A step failed. See the logs above."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
