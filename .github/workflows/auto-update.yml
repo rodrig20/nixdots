@@ -4,11 +4,11 @@ name: Update flake inputs
 
 on:
   schedule:
-    - cron: "33 3 * * *"
+    - cron: "30 0,12 * * *"
   workflow_dispatch:
 
 permissions:
-  contents: write #
+  contents: write
 
 concurrency:
   group: auto-update
@@ -35,16 +35,58 @@ jobs:
             git --no-pager diff --stat -- flake.lock
           fi
 
-      # Failures stop the job here: no commit, main stays untouched.
+      # Always build and scan
       - name: Build every host
-        if: steps.diff.outputs.changed == 'true'
         run: |
+          : > "$RUNNER_TEMP/out-paths.txt"
           for host in hosts/*/; do
             host="$(basename "$host")"
             echo "building nixosConfigurations.$host"
             nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" \
-              --no-link --accept-flake-config
+              --no-link --print-out-paths --accept-flake-config \
+              >> "$RUNNER_TEMP/out-paths.txt"
           done
+
+      # Report-only: scan the freshly built closure for CVEs. Exit codes:
+      # 0 = clean, 2 = vulnerabilities found (not a failure), other = error.
+      - name: Scan with vulnix
+        run: |
+          summary="$RUNNER_TEMP/vulnix-summary.md"
+          : > "$summary"
+
+          while IFS= read -r toplevel; do
+            host="$(echo "$toplevel" | sed -E 's/.*-nixos-system-([^-]+)-.*/\1/')"
+            tmp="$RUNNER_TEMP/scan-$host.txt"
+
+            set +e
+            nix run nixpkgs#vulnix -- "$toplevel" > "$tmp" 2>&1
+            code=$?
+            set -e
+
+            {
+              echo "## $host"
+              echo ""
+              if [ "$code" -eq 0 ]; then
+                echo "✅ No known vulnerabilities."
+              elif [ "$code" -eq 2 ]; then
+                echo "⚠️ Vulnerabilities found:"
+                echo ""
+                echo '```'
+                cat "$tmp"
+                echo '```'
+                echo "::warning::vulnix found vulnerabilities on $host"
+              else
+                echo "❌ vulnix failed (exit $code):"
+                echo ""
+                echo '```'
+                cat "$tmp"
+                echo '```'
+              fi
+              echo ""
+            } >> "$summary"
+          done < "$RUNNER_TEMP/out-paths.txt"
+
+          cat "$summary" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
