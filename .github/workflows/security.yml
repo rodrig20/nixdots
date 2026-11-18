@@ -8,7 +8,7 @@ name: Security audit
 
 on:
   schedule:
-    - cron: "0 0,8,16 * * *" # every 8h
+    - cron: "0 0,12 * * *" # every 12h
   workflow_dispatch:
 
 permissions:
@@ -22,7 +22,6 @@ concurrency:
 jobs:
   vulnix:
     runs-on: ubuntu-latest
-    timeout-minutes: 210
     steps:
       - uses: actions/checkout@v4
 
