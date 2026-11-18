@@ -47,8 +47,10 @@ jobs:
               >> "$RUNNER_TEMP/out-paths.txt"
           done
 
-      # Report-only: scan the freshly built closure for CVEs. Exit codes:
+      # Report-only: scan the runtime closure for CVEs. Exit codes:
       # 0 = clean, 2 = vulnerabilities found (not a failure), other = error.
+      # Uses -C (runtime closure only, skips build-time .drv deps) and
+      # reports critical (CVSS >= 9.0) prominently, medium/low collapsed.
       - name: Scan with vulnix
         run: |
           summary="$RUNNER_TEMP/vulnix-summary.md"
@@ -59,28 +61,87 @@ jobs:
             tmp="$RUNNER_TEMP/scan-$host.txt"
 
             set +e
-            nix run nixpkgs#vulnix -- "$toplevel" > "$tmp" 2>&1
+            nix run nixpkgs#vulnix -- -C "$toplevel" > "$tmp" 2>&1
             code=$?
             set -e
 
-            {
-              echo "## $host"
-              echo ""
-              if [ "$code" -eq 0 ]; then
-                echo "✅ No known vulnerabilities."
-              elif [ "$code" -eq 2 ]; then
-                echo "⚠️ Vulnerabilities found:"
+            if [ "$code" -eq 1 ] || [ "$code" -gt 2 ]; then
+              {
+                echo "## $host"
                 echo ""
-                echo '```'
-                cat "$tmp"
-                echo '```'
-                echo "::warning::vulnix found vulnerabilities on $host"
-              else
                 echo "❌ vulnix failed (exit $code):"
                 echo ""
                 echo '```'
                 cat "$tmp"
                 echo '```'
+                echo ""
+              } >> "$summary"
+              continue
+            fi
+
+            # Parse vulnix output: extract package, CVE, CVSS score.
+            # Output format: package-name / blank / store-path / header / CVE lines / separator
+            parsed="$RUNNER_TEMP/parsed-$host.tsv"
+            awk '
+              /^[A-Za-z0-9]/ && !/^https:/ && !/^-/ && !/\.drv/ && !/^CVE/ && NF == 1 { pkg = $0 }
+              /^https:\/\/nvd\.nist\.gov\/vuln\/detail\// {
+                split($1, a, "/");
+                cve = a[length(a)];
+                score = $2;
+                print pkg "\t" cve "\t" score;
+              }
+            ' "$tmp" > "$parsed"
+
+            # Split by severity
+            critical="$RUNNER_TEMP/critical-$host.md"
+            other="$RUNNER_TEMP/other-$host.md"
+            : > "$critical"
+            : > "$other"
+
+            crit_count=0
+            total_count=0
+
+            while IFS=$'\t' read -r pkg cve score; do
+              total_count=$((total_count + 1))
+              # CVSS >= 9.0 -> critical (show prominently)
+              if awk -v s="$score" 'BEGIN { exit !(s >= 9.0) }'; then
+                crit_count=$((crit_count + 1))
+                printf "| %s | [%s](https://nvd.nist.gov/vuln/detail/%s) | %s |\n" \
+                  "$pkg" "$cve" "$cve" "$score" >> "$critical"
+              else
+                printf "| %s | [%s](https://nvd.nist.gov/vuln/detail/%s) | %s |\n" \
+                  "$pkg" "$cve" "$cve" "$score" >> "$other"
+              fi
+            done < "$parsed"
+
+            {
+              echo "## $host"
+              echo ""
+              if [ "$total_count" -eq 0 ]; then
+                echo "✅ No known vulnerabilities in runtime closure."
+              else
+                echo "**$total_count vulnerabilities** ($crit_count critical, $((total_count - crit_count)) medium/low) — runtime closure only, build-time deps excluded."
+                echo ""
+                if [ "$crit_count" -gt 0 ]; then
+                  echo "### 🔴 Critical (CVSS ≥ 9.0)"
+                  echo ""
+                  echo "| Package | CVE | Score |"
+                  echo "|---------|-----|-------|"
+                  cat "$critical"
+                  echo ""
+                fi
+                if [ -s "$other" ]; then
+                  echo "<details>"
+                  echo "<summary>⚠️ Medium &amp; Low ($((total_count - crit_count)) CVEs) — click to expand</summary>"
+                  echo ""
+                  echo "| Package | CVE | Score |"
+                  echo "|---------|-----|-------|"
+                  cat "$other"
+                  echo ""
+                  echo "</details>"
+                  echo ""
+                fi
+                echo "::warning::vulnix found $total_count vulnerabilities on $host ($crit_count critical)"
               fi
               echo ""
             } >> "$summary"
