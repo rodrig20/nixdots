@@ -26,13 +26,11 @@ in
       substituters = [
         "https://cache.lantian.pub/lantian"
         "https://cache.nixos.org"
-        "https://noctalia.cachix.org"
         "https://cache.xinux.uz"
       ];
       trusted-public-keys = [
         "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
         "cache.xinux.uz:BXCrtqejFjWzWEB9YuGB7X2MV4ttBur1N8BkwQRdH+0="
       ];
       connect-timeout = 5;

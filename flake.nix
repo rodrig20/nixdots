@@ -4,12 +4,10 @@
   # Binary caches for faster package downloads
   nixConfig = {
     extra-substituters = [
-      "https://noctalia.cachix.org"
       "https://cache.lantian.pub/lantian"
       "https://cache.xinux.uz"
     ];
     extra-trusted-public-keys = [
-      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       "cache.xinux.uz:BXCrtqejFjWzWEB9YuGB7X2MV4ttBur1N8BkwQRdH+0="
     ];
   };
@@ -42,11 +40,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    noctalia = {
-      url = "github:noctalia-dev/noctalia/cachix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
     };
@@ -64,7 +57,7 @@
 
     # ADHD-friendly output style skill for OpenCode.
     i-have-adhd = {
-      url = "github:ayghri/i-have-adhd";
+      url = "github:ayghri/i-have-adhd/v0.4.1";
       flake = false;
     };
 
@@ -76,7 +69,7 @@
 
     # Google Antigravity CLI and apps
     antigravity-nix = {
-      url = "github:jacopone/antigravity-nix";
+      url = "github:jacopone/antigravity-nix/v2.33.0-4731201358004224";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
