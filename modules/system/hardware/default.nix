@@ -57,6 +57,11 @@ in
     services.logind.settings.Login = {
       HandlePowerKey = "suspend";
       HandlePowerKeyLongPress = "poweroff";
+
+      # Lid: always suspend
+      HandleLidSwitch = "suspend";
+      HandleLidSwitchDocked = "suspend";
+      HandleLidSwitchExternalPower = "suspend";
     };
     services.fstrim.enable = true;
     zramSwap = {
