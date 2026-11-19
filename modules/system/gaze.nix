@@ -68,6 +68,7 @@ in
 
       package = inputs.gaze.packages.${system}.gaze;
       gui = {
+        enable = true;
         package = inputs.gaze.packages.${system}.gaze-gui;
       };
 
