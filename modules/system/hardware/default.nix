@@ -52,6 +52,12 @@ in
     hardware.bluetooth.enable = true;
     services.power-profiles-daemon.enable = true;
     services.upower.enable = true;
+
+    # Physical power button
+    services.logind.settings.Login = {
+      HandlePowerKey = "suspend";
+      HandlePowerKeyLongPress = "poweroff";
+    };
     services.fstrim.enable = true;
     zramSwap = {
       enable = true;
