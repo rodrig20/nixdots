@@ -49,7 +49,10 @@ in
     };
     services.fwupd.enable = true;
     services.udisks2.enable = true;
-    hardware.bluetooth.enable = true;
+    hardware.bluetooth = {
+      enable = true;
+      powerOnBoot = false;
+    };
     services.power-profiles-daemon.enable = true;
     services.upower.enable = true;
 
