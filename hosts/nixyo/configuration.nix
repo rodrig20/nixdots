@@ -107,6 +107,7 @@
       fastfetch.enable = true;
       direnv.enable = true;
       hyprland.enable = true;
+      nwg-displays.enable = true;
       noctalia.enable = true;
       rclone = {
         enable = true;
