@@ -414,8 +414,14 @@ in
 
     tui = lib.mkOption {
       type = lib.types.attrs;
-      default = { };
-      description = "TUI-only config (tui.json). Theme is handled by Stylix, leave empty unless keybinds are needed.";
+      # Built-in attention
+      default = {
+        attention = {
+          sound = true;
+          volume = 1.0;
+        };
+      };
+      description = "TUI-only config (tui.json). Theme is handled by Stylix; attention.sound plays a chime when a turn completes.";
     };
 
     context = lib.mkOption {
