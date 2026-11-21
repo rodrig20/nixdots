@@ -62,6 +62,7 @@ in
 
         audio = {
           enable_sounds = true;
+          sound_volume = 1.0;
         };
 
         location = {
@@ -76,6 +77,12 @@ in
         osd = {
           background_opacity = 0.75;
           scale = 1.1;
+
+          # No OSD popups for the media player or the input layout switch.
+          kinds = {
+            media = false;
+            keyboard_layout = false;
+          };
         };
 
         plugins = {
