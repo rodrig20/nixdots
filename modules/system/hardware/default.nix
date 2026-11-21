@@ -61,11 +61,15 @@ in
       HandlePowerKey = "suspend";
       HandlePowerKeyLongPress = "poweroff";
 
-      # Lid: always suspend
-      HandleLidSwitch = "suspend";
-      HandleLidSwitchDocked = "suspend";
-      HandleLidSwitchExternalPower = "suspend";
+      # Lid: suspend now, then hibernate once the delay below elapses.
+      HandleLidSwitch = "suspend-then-hibernate";
+      HandleLidSwitchDocked = "suspend-then-hibernate";
+      HandleLidSwitchExternalPower = "suspend-then-hibernate";
     };
+
+    # suspend-then-hibernate
+    systemd.sleep.settings.Sleep.HibernateDelaySec = "30min";
+
     services.fstrim.enable = true;
     zramSwap = {
       enable = true;
