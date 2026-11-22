@@ -8,7 +8,6 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("noctalia msg settings-toggle"), { description = "Toggle noctalia-settings" })
 hl.bind(mainMod .. " + Comma", hl.dsp.exec_cmd("noctalia msg settings-toggle"), { description = "Toggle noctalia-settings" })
 hl.bind(mainMod .. " + Period", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher \"/e \""), { description = "Open the emoji picker" })
-hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle notifiactions"), { description = "Open Notifications" })
 
 -- Screenshots
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), { description = "Take fullscreen screenshot" })

@@ -15,8 +15,7 @@ hl.config({
         resize_on_border = true,
         allow_tearing = false,
         no_focus_fallback = true,
-        layout = "dwindle",
-        
+
         snap = {
              enabled = true,
              window_gap = 4,

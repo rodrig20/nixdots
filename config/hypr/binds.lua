@@ -60,8 +60,8 @@ hl.bind(mainMod .. " + CTRL + up",  hl.dsp.window.resize({ x = 0, y = 100, relat
 hl.bind(mainMod .. " + CTRL + down",    hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { repeating = false }, { description = "Reduce window height" })
 
 
-hl.bind(mainMod .. " + ALT + down", layout_bind(nil, { scrolling = hl.dsp.layout("colresize -conf"), { repeating = false } }), { description = "Increase window height" })
-hl.bind(mainMod .. " + ALT + up",   layout_bind(nil, { scrolling = hl.dsp.layout("colresize +conf"), { repeating = false } }), { description = "Reduce window height" })
+hl.bind(mainMod .. " + ALT + down", layout_bind(nil, { scrolling = hl.dsp.layout("colresize -conf") }), { repeating = false }, { description = "Reduce column width" })
+hl.bind(mainMod .. " + ALT + up",   layout_bind(nil, { scrolling = hl.dsp.layout("colresize +conf") }), { repeating = false }, { description = "Increase column width" })
 
 
 hl.bind(mainMod .. " + Dead_Acute", layout_bind(nil, {scrolling = hl.dsp.layout("move +200")}), { repeating = true, description = "Move window left in scrolling layout" })
