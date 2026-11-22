@@ -39,7 +39,12 @@ in
           "" = {
             enable = true;
             mountPoint = remote.mountPoint;
-            options = remote.mountOptions;
+            # --allow-other only works with user_allow_other in /etc/fuse.conf
+            options =
+              remote.mountOptions
+              // lib.optionalAttrs (osConfig.systemSettings.fuse.allowOther or false) {
+                allow-other = true;
+              };
           };
         };
       }) (lib.filterAttrs (_: remote: remote.enable) cfg.remotes);

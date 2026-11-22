@@ -16,6 +16,7 @@
 
   systemSettings = {
     btrfs.enable = true;
+    fuse.allowOther = true;
     gparted.enable = true;
     boot = {
       enable = true;
@@ -125,9 +126,14 @@
             mountOptions = {
               exclude = ".crypt";
               cache-dir = "/home/rodri/.cache/rclone/gdrive";
-              vfs-cache-mode = "writes";
+              vfs-cache-mode = "full";
               vfs-cache-max-age = "1h";
+              vfs-cache-max-size = "4G";
               vfs-write-back = "5s";
+              vfs-read-chunk-streams = 4;
+              dir-cache-time = "1h";
+              poll-interval = "1m";
+              umask = "0002";
             };
           };
           gcrypt = {
@@ -138,6 +144,9 @@
               vfs-cache-mode = "writes";
               vfs-cache-max-age = "1h";
               vfs-write-back = "5s";
+              dir-cache-time = "1h";
+              poll-interval = "1m";
+              umask = "0002";
             };
           };
         };
