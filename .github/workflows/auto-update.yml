@@ -19,13 +19,14 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
 
       - name: Update inputs
-        run: nix flake update
+        run: nix flake update --accept-flake-config
 
       # First build: validates the flake.lock update.
       # Failure stops the job here: no bump, no scan, no commit.
@@ -87,7 +88,7 @@ jobs:
 
           if [ "$bumped" = true ]; then
             echo "Updating lock for bumped inputs..."
-            nix flake update
+            nix flake update --accept-flake-config
           fi
 
           echo "bumped=$bumped" >> "$GITHUB_OUTPUT"
@@ -223,6 +224,7 @@ jobs:
           cat "$summary" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit and push
+        if: github.ref == 'refs/heads/main'
         run: |
           if git diff --quiet -- flake.lock flake.nix; then
             echo "No changes to commit."
@@ -236,8 +238,9 @@ jobs:
           else
             git commit -m "chore: update flake.lock (auto)"
           fi
-          git pull --rebase origin main
-          git push
+          git fetch origin main:refs/remotes/origin/main
+          git rebase origin/main
+          git push origin HEAD:main
 
       # On failure, write a clear message plus the actual build error log
       # to the job summary.
