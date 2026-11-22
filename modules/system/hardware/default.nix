@@ -12,10 +12,12 @@ in
       options = {
         cpuVendor = lib.mkOption {
           type = lib.types.enum [ "intel" "other" ];
+          default = "other";
           description = "CPU vendor for hardware-specific config (intel, other)";
         };
         gpuVendor = lib.mkOption {
           type = lib.types.enum [ "igpu_intel" "other" ];
+          default = "other";
           description = "GPU vendor for hardware-specific config (igpu_intel, other)";
         };
       };
