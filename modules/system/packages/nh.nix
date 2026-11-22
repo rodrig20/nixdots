@@ -12,6 +12,7 @@ in
       default = null;
       description = "Flake directory for NH_FLAKE (enables bare `nh os switch`).";
     };
+    clean.enable = lib.mkEnableOption "periodic nh clean (replaces nix.gc.automatic)";
   };
 
   config = lib.mkIf cfg.enable {
@@ -19,8 +20,11 @@ in
       enable = true;
       flake = cfg.flake;
 
-      # Only used by the periodic clean service
-      clean.extraArgs = "--no-direnv --keep-since 4d --keep 3";
+      clean = {
+        enable = cfg.clean.enable;
+        # Preserves direnv GC roots; nix.gc.automatic is disabled while active.
+        extraArgs = "--no-direnv --keep-since 4d --keep 3";
+      };
     };
   };
 }

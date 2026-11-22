@@ -28,6 +28,7 @@
     nh = {
       enable = true;
       flake = "/home/rodri/nixdots";
+      clean.enable = true;
     };
     vim.enable = true;
     wget.enable = true;

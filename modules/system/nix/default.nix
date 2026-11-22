@@ -12,8 +12,10 @@ in
   options.systemSettings.nix.enable = lib.mkEnableOption "nix settings (flakes, GC, store)";
 
   config = lib.mkIf cfg.enable {
+    # nh clean and nix.gc.automatic are mutually exclusive (nixpkgs warns if
+    # both are on). When the host opts into nh clean, it owns generation GC.
     nix.gc = {
-      automatic = true;
+      automatic = !(config.systemSettings.nh.clean.enable or false);
       dates = "weekly";
       options = "--delete-older-than 30d";
     };
