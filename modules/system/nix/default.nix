@@ -3,9 +3,10 @@
 
 let
   cfg = config.systemSettings.nix;
-in
-{
-  options.systemSettings.nix.enable = lib.mkEnableOption "nix settings (flakes, GC, store)";
+  # Derive the host settings from the flake's nixConfig to keep one definition.
+  flakeConfig = import ../../../flake.nix;
+  extraSubstituters = flakeConfig.nixConfig.extra-substituters;
+  extraKeys = flakeConfig.nixConfig.extra-trusted-public-keys;
 
   config = lib.mkIf cfg.enable {
     nix.gc = {
@@ -23,16 +24,8 @@ in
     nix.settings = {
       experimental-features = [ "nix-command" "flakes" ];
       max-jobs = "auto";
-      substituters = [
-        "https://cache.lantian.pub/lantian"
-        "https://cache.nixos.org"
-        "https://cache.xinux.uz"
-      ];
-      trusted-public-keys = [
-        "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "cache.xinux.uz:BXCrtqejFjWzWEB9YuGB7X2MV4ttBur1N8BkwQRdH+0="
-      ];
+      substituters = extraSubstituters;
+      trusted-public-keys = extraKeys;
       connect-timeout = 5;
     };
 
