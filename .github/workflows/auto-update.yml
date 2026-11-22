@@ -45,7 +45,7 @@ jobs:
           done
 
       # Bump flake input version tags (e.g. lanzaboote/v1.2.0 -> v1.3.0).
-      # Only touches inputs whose URL matches github:owner/repo/vX.Y.Z.
+      # Only touches inputs whose URL matches github:owner/repo/vX.Y.Z[-N].
       # Queries the GitHub API for the latest tag on each matching repo.
       - name: Bump input versions
         id: bump
@@ -54,20 +54,23 @@ jobs:
         run: |
           bumped=false
 
-          # Unique github:owner/repo/vX.Y.Z URLs found in flake.nix
+          # Unique github:owner/repo/vX.Y.Z[-N] URLs found in flake.nix.
+          # The optional -N suffix (e.g. a build ID) is part of the tag and
+          # must be parsed and replaced in full.
           # (|| true: no matches must not fail the step under `set -e`)
-          urls=$(grep -oE 'github:[^"]+/v[0-9]+\.[0-9]+\.[0-9]+' flake.nix | sort -u || true)
+          urls=$(grep -oE 'github:[^"]+/v[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?' flake.nix | sort -u || true)
 
           while IFS= read -r url; do
             [ -z "$url" ] && continue
-            repo=$(echo "$url" | sed 's|^github:||; s|/v[0-9.]*$||')
-            current_tag=$(echo "$url" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$')
+            path_with_tag=${url#github:}
+            current_tag=${path_with_tag##*/}
+            repo=${path_with_tag%/*}
 
-            # Latest stable vX.Y.Z tag on that repo. The API order is not
+            # Latest stable vX.Y.Z[-N] tag on that repo. The API order is not
             # semver-sorted, so collect all tags, keep only stable versions
             # (skip RCs/nightlies) and sort numerically. Empty if none/API fails.
             latest_tag=$(gh api "repos/$repo/tags" --jq '.[].name' 2>/dev/null \
-              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)
+              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?$' | sort -V | tail -1 || true)
             [ -z "$latest_tag" ] && continue
             [ "$latest_tag" = "$current_tag" ] && continue
 
@@ -75,7 +78,8 @@ jobs:
             newest=$(printf '%s\n%s\n' "$current_tag" "$latest_tag" | sort -V | tail -1)
             if [ "$newest" = "$latest_tag" ]; then
               echo "Bumping $repo: $current_tag -> $latest_tag"
-              # Replace the full URL to avoid touching other inputs with the same tag
+              # Replace the full URL to avoid touching other inputs with the same
+              # tag and to avoid leaving the old -N suffix on the new version.
               sed -i "s|github:$repo/$current_tag|github:$repo/$latest_tag|g" flake.nix
               bumped=true
             fi
