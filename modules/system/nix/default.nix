@@ -7,6 +7,9 @@ let
   flakeConfig = import ../../../flake.nix;
   extraSubstituters = flakeConfig.nixConfig.extra-substituters;
   extraKeys = flakeConfig.nixConfig.extra-trusted-public-keys;
+in
+{
+  options.systemSettings.nix.enable = lib.mkEnableOption "nix settings (flakes, GC, store)";
 
   config = lib.mkIf cfg.enable {
     nix.gc = {
