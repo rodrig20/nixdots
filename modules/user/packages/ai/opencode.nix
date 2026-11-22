@@ -402,8 +402,16 @@ in
 
         # Per-session sidebar off by default
         session.sidebar = "hide";
+
+        # The TUI reads attention from cli.json at runtime (tui.json was
+        # migrated away), so it must live here to survive rebuilds.
+        attention = {
+          sound = true;
+          notifications = true;
+          volume = 1.0;
+        };
       };
-      description = "CLI-specific config (OpenCode 2 cli.json): terminal client settings (theme, keybinds).";
+      description = "CLI-specific config (OpenCode 2 cli.json): terminal client settings (theme, keybinds, attention).";
     };
 
     settings = lib.mkOption {
@@ -414,14 +422,11 @@ in
 
     tui = lib.mkOption {
       type = lib.types.attrs;
-      # Built-in attention
-      default = {
-        attention = {
-          sound = true;
-          volume = 1.0;
-        };
-      };
-      description = "TUI-only config (tui.json). Theme is handled by Stylix; attention.sound plays a chime when a turn completes.";
+      # Empty: OpenCode migrated tui.json into cli.json, and the TUI only
+      # reads cli.json now. Keeping attention here would silently reset it
+      # to defaults (off/off/0.4) on every rebuild.
+      default = { };
+      description = "Legacy TUI config (tui.json). Unused by OpenCode >= 2; attention lives in cli.";
     };
 
     context = lib.mkOption {
