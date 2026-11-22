@@ -18,6 +18,9 @@ in
     programs.nh = {
       enable = true;
       flake = cfg.flake;
+
+      # Only used by the periodic clean service
+      clean.extraArgs = "--no-direnv --keep-since 4d --keep 3";
     };
   };
 }
