@@ -22,6 +22,18 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
 
+      # Reuse what publish-cache.yml already uploaded instead of rebuilding it.
+      # Same mechanism as auto-update.yml; a missing cache falls through to
+      # cache.nixos.org as before, so a PR never fails here.
+      - name: Start cache proxy
+        env:
+          # Without this the proxy would read upstream's cache instead of ours.
+          NIXCACHE_REPO: ${{ github.repository }}
+        run: |
+          source lib/cache-builder.sh
+          start_self_substituter
+          echo "SELF_PROXY_PID=${SELF_PROXY_PID:-}" >> "$GITHUB_ENV"
+
       - name: Build all hosts
         run: |
           for host in hosts/*/; do
@@ -30,3 +42,8 @@ jobs:
             nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" \
               --no-link --print-out-paths --accept-flake-config
           done
+
+      # No-op if the proxy never started; keeps the runner tidy on failure too.
+      - name: Stop cache proxy
+        if: always()
+        run: source lib/cache-builder.sh && stop_self_substituter

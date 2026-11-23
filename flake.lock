@@ -405,6 +405,27 @@
         "type": "github"
       }
     },
+    "nixcache-oci": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795296196,
+        "narHash": "sha256-6RlEkgkot1i8SJSQA2CvauRGX2l68kyDkJFT1pV/DEY=",
+        "owner": "cmspam",
+        "repo": "nixcache-oci",
+        "rev": "838bed6046ff2f0428b49485ebd07269cd0fc399",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cmspam",
+        "repo": "nixcache-oci",
+        "rev": "838bed6046ff2f0428b49485ebd07269cd0fc399",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1795188322,
@@ -509,6 +530,7 @@
         "i-have-adhd": "i-have-adhd",
         "lanzaboote": "lanzaboote",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
+        "nixcache-oci": "nixcache-oci",
         "nixpkgs": "nixpkgs_2",
         "stylix": "stylix",
         "tinted-schemes": "tinted-schemes_2",

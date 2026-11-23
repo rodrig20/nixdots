@@ -16,6 +16,8 @@ Currently includes **NixYo** (Lenovo Yoga Slim 7 14ILL10).
 | `config/` | Static config symlinked into `~/.config` (e.g. `hypr/`) |
 | `secrets/` | agenix-encrypted `.age` files |
 | `agenix-rules.nix` | Recipients for each secret |
+| `lib/cache-builder.sh`, `lib/cache/` | Binary-cache pipeline (build -> sign -> upload NARs to GHCR), split from [nixcache-oci](https://github.com/cmspam/nixcache-oci) into small files: `oci` (registry API), `paths` (discover/pick), `export` (NARs), `index` (upload), `substituter`, `pipeline` |
+| `proxy/` | nixcache-proxy split into `config`/`ghcr`/`index`/`server`/`main`: exposes the GHCR cache as a Nix substituter on `localhost:37515` |
 | `templates/` | Flake templates (`base`) |
 
 Within `modules/system/` and `modules/user/`, each subdirectory (and each file under `packages/`) is one self-contained module. Add or remove a module by dropping a file/folder there and toggling its options in the host config. Nothing else needs updating.
@@ -68,6 +70,22 @@ Currently available:
 | `base` | Minimal `flake.nix` (`nixpkgs` input + empty `devShells.default`) with a `.envrc` for direnv; extend it as you go |
 
 Each generated project is a single self-contained `flake.nix` with no pre-defined structure. It ships a `.envrc` for **direnv** (enabled via `userSettings.programs.direnv`): `cd` into the project and its devShell packages join your *current* shell (zsh aliases, starship, fzf stay intact). Authorize it once per project with `direnv allow`.
+
+## Binary cache
+
+Locally-built store paths are published to a self-hosted cache on GHCR (no third-party service), so rebuilds substitute instead of recompiling:
+
+- **Publish** — `.github/workflows/publish-cache.yml` runs the `nixcache-oci` pipeline (`lib/cache-builder.sh`) on every push to `main` that can change the closure. It builds the flake outputs, keeps only paths no upstream cache signs, signs them with `NIX_SIGNING_KEY` and uploads them as OCI blobs to `ghcr.io/rodrig20/nixdots/nix-cache`. `.github/workflows/gc-cache.yml` prunes the index weekly (30-day retention). The scheduled `auto-update` publishes directly through this pipeline after its commit; a push with `GITHUB_TOKEN` does not trigger other workflows, so this step is what updates the cache automatically.
+- **CI** — `pr-check.yml` and `auto-update.yml` start the same proxy for the duration of the job (`start_self_substituter` -> builds -> `stop_self_substituter`), so PRs and the daily update download what was already published instead of rebuilding it. The proxy pulls anonymously from the public package (no token is passed); if the cache is missing or empty, every lookup 404s and the build falls back to `cache.nixos.org` exactly as before.
+- **Consume** — `systemSettings.nixcache.enable` (see `modules/system/nixcache.nix`) runs `services.nixcache-proxy`, which exposes the GHCR index as an ordinary substituter on `localhost:37515` and streams NARs straight from the registry. The public key lives in `flake.nix` `nixConfig`, so CI and NixOS trust the same signatures.
+
+One-time setup:
+
+1. Generate the key pair and store the secret on GitHub (Settings -> Secrets and variables -> Actions -> `NIX_SIGNING_KEY`); the public half is already pinned in `flake.nix`.
+   ```bash
+   nix key generate-secret --key-name rodrig20-nixdots   # -> NIX_SIGNING_KEY secret
+   ```
+2. After the first publish run, set the package `ghcr.io/rodrig20/nixdots/nix-cache` to **Public** so the proxy can pull it anonymously.
 
 ## Deploy
 

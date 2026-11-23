@@ -1,6 +1,7 @@
 # flake.lock + flake.nix refresh: update inputs, build, bump version tags,
 # rebuild, scan runtime closure for CVEs, and commit only when everything passes.
-# Order: flake update -> build -> bump versions -> build -> vulnix -> commit.
+# Order: flake update -> build -> bump versions -> build -> vulnix -> commit ->
+# publish binary cache (the GITHUB_TOKEN push does not trigger other workflows).
 # If either build fails, the job stops with a log and nothing is committed.
 name: Update flake inputs
 
@@ -11,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 concurrency:
   group: auto-update
@@ -24,6 +26,32 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
+
+      - name: Setup signing key
+        env:
+          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
+        run: |
+          if [ -n "$NIX_SIGNING_KEY" ]; then
+            printf '%s\n' "$NIX_SIGNING_KEY" > "$RUNNER_TEMP/signing-key"
+            nix key convert-secret-to-public < "$RUNNER_TEMP/signing-key" \
+              > "$RUNNER_TEMP/signing-key.pub"
+            echo "NIXCACHE_SIGNING_KEY_FILE=$RUNNER_TEMP/signing-key" >> "$GITHUB_ENV"
+            echo ">>> Signing key configured"
+          else
+            echo "::notice::NIX_SIGNING_KEY not set — cache will be unsigned and rejected by require-sigs clients"
+          fi
+
+      # Reuse what publish-cache.yml already uploaded instead of rebuilding it.
+      # The proxy reads the public package anonymously; a missing cache just
+      # falls through to cache.nixos.org as before.
+      - name: Start cache proxy
+        env:
+          # Without this the proxy would read upstream's cache instead of ours.
+          NIXCACHE_REPO: ${{ github.repository }}
+        run: |
+          source lib/cache-builder.sh
+          start_self_substituter
+          echo "SELF_PROXY_PID=${SELF_PROXY_PID:-}" >> "$GITHUB_ENV"
 
       - name: Update inputs
         run: nix flake update --accept-flake-config
@@ -224,6 +252,7 @@ jobs:
           cat "$summary" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit and push
+        id: commit
         if: github.ref == 'refs/heads/main'
         run: |
           if git diff --quiet -- flake.lock flake.nix; then
@@ -241,6 +270,25 @@ jobs:
           git fetch origin main:refs/remotes/origin/main
           git rebase origin/main
           git push origin HEAD:main
+
+      # The proxy only exists to serve the builds above; shut it down even when
+      # an earlier step failed (no-op if it never started).
+      - name: Stop cache proxy
+        if: always()
+        run: source lib/cache-builder.sh && stop_self_substituter
+
+      # Publish the paths built in this run to our GHCR cache. The commit above
+      # went out with GITHUB_TOKEN, which does NOT trigger other workflows, so
+      # this step is what actually updates the cache from the scheduled update.
+      - name: Publish binary cache
+        if: ${{ steps.commit.outcome == 'success' }}
+        env:
+          NIXCACHE_REPO: ${{ github.repository }}
+          NIXCACHE_CONFIG_DIR: .
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          source lib/cache-builder.sh
+          full_pipeline
 
       # On failure, write a clear message plus the actual build error log
       # to the job summary.

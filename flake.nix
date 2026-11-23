@@ -1,13 +1,17 @@
 {
   description = "NixOS multi-machine configuration";
 
-  # Binary caches for faster package downloads
+  # Binary caches for faster package downloads.
+  # The nixdots key signs the cache published by publish-cache.yml; the localhost
+  # substituter belongs to services.nixcache-proxy, so CI never reaches for a
+  # proxy that only exists on NixOS hosts.
   nixConfig = {
     extra-substituters = [
       "https://cache.lantian.pub/lantian"
     ];
     extra-trusted-public-keys = [
       "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
+      "rodrig20-nixdots:PheRyVacx5PaOnubgBCXRjecrLEvXnlCmZYN/IPOEB4="
     ];
   };
 
@@ -41,6 +45,12 @@
 
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
+    };
+
+    # GHCR-backed binary cache, pinned to the rev lib/cache/ and proxy/ came from.
+    nixcache-oci = {
+      url = "github:cmspam/nixcache-oci/838bed6046ff2f0428b49485ebd07269cd0fc399";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     stylix = {

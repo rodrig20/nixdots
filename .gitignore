@@ -2,5 +2,13 @@
 result
 result-*
 
+# Python bytecode
+__pycache__/
+
 # NixOS switcher
 *.qcow2
+
+# Binary cache signing material
+nix-cache-signing.key
+nix-cache-signing.key.pub
+public-key.txt

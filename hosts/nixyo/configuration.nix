@@ -23,6 +23,8 @@
     };
     locale.enable = true;
     nix.enable = true;
+    # Local substituter for the cache published by publish-cache.yml.
+    nixcache.enable = true;
     nh = {
       enable = true;
       flake = "/home/rodri/nixdots";

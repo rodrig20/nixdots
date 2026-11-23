@@ -1,0 +1,72 @@
+# Publish locally-built store paths to our own binary cache on GHCR.
+# Order: sign with NIX_SIGNING_KEY -> build every flake output -> keep only
+# paths no upstream cache signs -> upload NARs + cache-index to
+# ghcr.io/<repo>/nix-cache. Consumed by services.nixcache-proxy on NixOS and by
+# the self-substituter in pr-check/auto-update.
+name: Publish binary cache
+
+on:
+  push:
+    branches: [main]
+    # Only paths that can change the closure; flake.lock counts (input bumps).
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "hosts/**"
+      - "modules/**"
+      - "config/**"
+      - "lib/cache-builder.sh"
+      - "lib/cache/**"
+      - "proxy/**"
+      - ".github/workflows/publish-cache.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-cache
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: cachix/install-nix-action@v31
+
+      # The signing key turns into NIXCACHE_SIGNING_KEY_FILE; without it the
+      # pipeline still uploads, but clients with require-sigs = true reject
+      # the NARs. The .pub sibling is what update_cache_index embeds in the
+      # cache-index manifest.
+      - name: Setup signing key
+        env:
+          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
+        run: |
+          if [ -n "$NIX_SIGNING_KEY" ]; then
+            printf '%s\n' "$NIX_SIGNING_KEY" > "$RUNNER_TEMP/signing-key"
+            nix key convert-secret-to-public < "$RUNNER_TEMP/signing-key" \
+              > "$RUNNER_TEMP/signing-key.pub"
+            echo "NIXCACHE_SIGNING_KEY_FILE=$RUNNER_TEMP/signing-key" >> "$GITHUB_ENV"
+            echo ">>> Signing key configured ($(cat "$RUNNER_TEMP/signing-key.pub"))"
+          else
+            echo "::notice::NIX_SIGNING_KEY not set — cache will be unsigned and rejected by require-sigs clients"
+            echo ">>> No signing key configured"
+          fi
+
+      # The pipeline authenticates to GHCR itself through GITHUB_TOKEN
+      # (curl + OCI token exchange in lib/cache-builder.sh); no docker involved.
+      # No `nix flake update` either: auto-update.yml already owns flake.lock,
+      # running it twice per push would race on commits.
+      - name: Build and publish cache
+        env:
+          NIXCACHE_REPO: ${{ github.repository }}
+          # Repo root holds flake.nix (nixcache-oci defaults to a config/ subdir).
+          NIXCACHE_CONFIG_DIR: .
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          source lib/cache-builder.sh
+          full_pipeline
