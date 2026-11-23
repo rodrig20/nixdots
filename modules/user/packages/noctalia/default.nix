@@ -92,7 +92,6 @@ in
             ++ lib.optionals cfg.plugins.colorPicker.enable [ "oldirtty/color_picker" ]
             ++ lib.optionals cfg.plugins.regionRecorder.enable [ "h-jangra/region-recorder" ]
             ++ lib.optionals cfg.plugins.ocr.enable [ "fel/ocr" ];
-          auto_update = "all";
         };
 
         # Plugin settings (base layer; GUI edits in settings.toml win).
