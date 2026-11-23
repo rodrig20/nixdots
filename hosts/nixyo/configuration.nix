@@ -77,10 +77,9 @@
   };
 
   home-manager.users.rodri.userSettings = {
-    name = "rodri";
     shell.enable = true;
     programs = {
-      btop_stylix.enable = true;
+      btop.enable = true;
       git = {
         enable = true;
         name = "rodrig20";
