@@ -8,11 +8,9 @@
 
   hardware.pc = import ./hardware/nixyo.nix;
 
-  # Where the hibernation image is written and read back from (NixOS passes it
-  # as resume= on the kernel command line). Must be the disk swap: without it
-  # the kernel picks the highest-priority swap device, which is zram
-  # (RAM-backed), and hibernation fails.
-  boot.resumeDevice = "/dev/disk/by-uuid/7ed562f5-e189-43c6-985c-584b974881fe";
+  # Resume from the disk swap declared in hardware-configuration.nix.
+  # Derived from swapDevices so the UUID lives in one place only.
+  boot.resumeDevice = lib.head (map (d: d.device) config.swapDevices);
 
   systemSettings = {
     btrfs.enable = true;
