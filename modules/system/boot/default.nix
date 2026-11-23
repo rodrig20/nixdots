@@ -1,4 +1,5 @@
-# Boot loader with systemd-boot; the kernel is chosen per host.
+# Boot loader (systemd-boot unless Lanzaboote/Secure Boot replaces it);
+# the kernel is chosen per host.
 { config, lib, ... }:
 
 let
@@ -6,7 +7,7 @@ let
 in
 {
   options.systemSettings.boot = {
-    enable = lib.mkEnableOption "systemd-boot + silent boot";
+    enable = lib.mkEnableOption "silent boot (systemd-boot unless Secure Boot replaces it)";
 
     # Each host picks its own kernel; null keeps the NixOS default (pkgs.linuxPackages).
     kernelPackages = lib.mkOption {
@@ -38,7 +39,6 @@ in
       boot.consoleLogLevel = 0;
       boot.kernelParams = [
         "quiet"
-        "splash"
         "boot.shell_on_fail"
         "udev.log_level=3"
         "rd.systemd.show_status=false"
