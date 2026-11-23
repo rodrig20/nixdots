@@ -204,8 +204,9 @@ let
   finalGeminiContext = lib.concatStringsSep "\n\n" (lib.optional (cfg.context != "") cfg.context);
 
   defaultPackage =
-    if inputs ? antigravity-nix && inputs.antigravity-nix ? packages && inputs.antigravity-nix.packages ? ${pkgs.system}
-    then inputs.antigravity-nix.packages.${pkgs.system}.google-antigravity-cli
+    let system = pkgs.stdenv.hostPlatform.system;
+    in if inputs ? antigravity-nix && inputs.antigravity-nix ? packages && inputs.antigravity-nix.packages ? ${system}
+    then inputs.antigravity-nix.packages.${system}.google-antigravity-cli
     else pkgs.antigravity-cli;
 
   normalizedCommands = lib.mapAttrs (name: cmd:
