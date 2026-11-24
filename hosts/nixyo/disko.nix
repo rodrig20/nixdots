@@ -10,13 +10,32 @@
 # passes it with `--argstr ramGb "$RAM_GB"`. Override the result explicitly with
 # `--argstr swapSize 8G`. During pure flake evaluation this value is unused
 # (disko scripts only run in the installer), hence the harmless fallback.
-{ device ? "/dev/disk/by-id/DISKO_DEVICE"
+#
+# LUKS/TPM2 are per-host choices made in hosts/<host>/configuration.nix:
+#   systemSettings.disko.luks.enable = true;
+#   systemSettings.disko.luks.tpm2 = true;   # only meaningful with LUKS
+# NixOS evaluation reads those options from `config`; the installer passes the
+# same values as --argstr luks / --argstr tpm2, plus --argstr passwordFile.
+{ config ? null
+, device ? "/dev/disk/by-id/DISKO_DEVICE"
 , ramGb ? null
 , swapSize ? null
+, luks ? false
+, tpm2 ? false
+, passwordFile ? null
 , ...
 }:
 
 let
+  fromHost = config != null;
+
+  # `--argstr` passes strings; the NixOS module system passes real booleans.
+  asBool = v: v == true || v == "true";
+  luksEnable = if fromHost then config.systemSettings.disko.luks.enable else asBool luks;
+  tpm2Enable = luksEnable && (
+    if fromHost then config.systemSettings.disko.luks.tpm2 else asBool tpm2
+  );
+
   ram = if ramGb == null then 0 else builtins.fromJSON ramGb;
   swapSizeForDisk =
     if swapSize != null then
@@ -31,7 +50,7 @@ let
     # Overwrite any existing signature (fresh install).
     extraArgs = [ "-f" ];
     subvolumes = {
-      # Root subvolume (recreated at boot when impermanence is enabled).
+      # Recreated on every boot by modules/system/impermanence.nix.
       root = {
         mountpoint = "/";
         mountOptions = [ "compress=zstd:3" "noatime" ];
@@ -51,6 +70,23 @@ let
     };
   };
 
+  # With LUKS the btrfs partition is the mapper device; /boot and swap stay
+  # plaintext. Disko adds boot.initrd.luks.devices."cryptroot" automatically.
+  rootContent =
+    if luksEnable then
+      {
+        type = "luks";
+        name = "cryptroot";
+        # null => disko asks interactively; install.sh always passes a file.
+        passwordFile = passwordFile;
+        # These options must match the systemd-cryptenroll call in install.sh.
+        settings = if tpm2Enable then {
+          crypttabExtraOpts = [ "tpm2-device=auto" "tpm2-pcrs=7" ];
+        } else { };
+        content = btrfsContent;
+      }
+    else
+      btrfsContent;
 in
 {
   disko.devices = {
@@ -88,7 +124,7 @@ in
               name = "root";
               label = "root";
               size = "100%";
-              content = btrfsContent;
+              content = rootContent;
             };
           };
         };

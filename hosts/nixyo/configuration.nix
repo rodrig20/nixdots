@@ -14,6 +14,8 @@
     # Disko owns fileSystems/swapDevices/boot.resumeDevice.
     disko = {
       enable = true;
+      luks.enable = true;
+      luks.tpm2 = true;
     };
     btrfs.enable = true;
     fuse.allowOther = true;
