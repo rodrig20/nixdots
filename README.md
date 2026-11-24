@@ -170,7 +170,7 @@ Notes:
 | `secrets/nixyo-root-password.age` | `users.users.root.hashedPasswordFile` | `age` |
 | `secrets/nixyo-rodri-password.age` | `users.users.<user>.hashedPasswordFile` | `age` |
 
-Both secrets use the same `~/.ssh/id_ed25519_agenix` key. Encrypt the hashes:
+Both secrets use the same `~/.ssh/id_ed25519_agenix` key and are already encrypted. To change a password:
 
 ```bash
 openssl passwd -6
@@ -178,7 +178,7 @@ echo '<hash>' | nix run github:ryantm/agenix -- -e secrets/nixyo-root-password.a
 echo '<hash>' | nix run github:ryantm/agenix -- -e secrets/nixyo-rodri-password.age
 ```
 
-The two `.age` files are placeholders until you replace them.
+`passwd` is not enough: `/etc/shadow` is wiped on every boot. `install.sh` copies the agenix key into the target **before** `nixos-install` so activation can decrypt the secrets, and skips the interactive root password.
 
 ## Project templates
 

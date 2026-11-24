@@ -183,18 +183,24 @@ if [[ "$LUKS_ENABLED" == "true" && "$TPM2_ENABLED" == "true" ]]; then
   ok "TPM2 key enrolled"
 fi
 
-# --- NixOS -----------------------------------------------------------------
-info "Installing $HOST..."
-nixos-install --flake "$REPO_ROOT#$HOST"
-ok "generation installed"
-
 # --- Agenix key -------------------------------------------------------------
-# /home is a persistent subvolume, but it is empty on a fresh disk.
+# Copy BEFORE nixos-install: activation decrypts the password secrets inside
+# the target chroot and needs a readable identity there. /home is persistent.
 SSH_DIR="$ROOT_MOUNTPOINT/home/$USER_NAME/.ssh"
 mkdir -p "$SSH_DIR"
 cp "$AGENIX_KEY" "$SSH_DIR/id_ed25519_agenix"
 chmod 700 "$SSH_DIR"
 chmod 600 "$SSH_DIR/id_ed25519_agenix"
+ok "agenix key staged at $SSH_DIR/id_ed25519_agenix"
+
+# --- NixOS -----------------------------------------------------------------
+info "Installing $HOST..."
+# The durable root password comes from agenix; the interactive one would be
+# wiped by impermanence on the first boot anyway.
+nixos-install --flake "$REPO_ROOT#$HOST" --no-root-password
+ok "generation installed"
+
+# /etc/passwd and /etc/group now exist in the target, so fix the ownership.
 USER_UID="$(awk -F: -v u="$USER_NAME" '$1 == u { print $3; exit }' "$ROOT_MOUNTPOINT/etc/passwd" 2>/dev/null || true)"
 USER_GID="$(awk -F: '$1 == "users" { print $3; exit }' "$ROOT_MOUNTPOINT/etc/group" 2>/dev/null || true)"
 chown -R "${USER_UID:-1000}:${USER_GID:-100}" "$SSH_DIR"
