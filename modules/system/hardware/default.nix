@@ -55,6 +55,12 @@ in
       enable = true;
       powerOnBoot = false;
     };
+
+    # Impermanence: paired devices and adapter settings live here.
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = [ "/var/lib/bluetooth" ];
+      };
     services.power-profiles-daemon.enable = true;
     services.upower.enable = true;
 

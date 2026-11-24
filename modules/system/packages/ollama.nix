@@ -36,5 +36,12 @@ in
         OLLAMA_IGPU_ENABLE = "1";
       };
     };
+
+    # Impermanence: pulled models (multi-GB) would otherwise be re-downloaded
+    # on every boot.
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = [ "/var/lib/ollama" ];
+      };
   };
 }

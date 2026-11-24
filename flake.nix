@@ -23,6 +23,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    impermanence = {
+      url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -120,6 +125,7 @@
 
               ./modules/system
 
+              inputs.impermanence.nixosModules.impermanence
               inputs.disko.nixosModules.disko
               inputs.home-manager.nixosModules.home-manager
               {

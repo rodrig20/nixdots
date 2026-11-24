@@ -33,6 +33,13 @@ in
       pkiBundle = "/var/lib/sbctl";
     };
 
+    # Impermanence: without the Secure Boot keys the machine won't boot back
+    # into user mode after a reboot (see the backup note at the top).
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = [ "/var/lib/sbctl" ];
+      };
+
     environment.systemPackages = [ pkgs.sbctl ];
   };
 }
