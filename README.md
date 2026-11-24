@@ -114,6 +114,54 @@ There is no hardcoded UUID/device: disko declares `disko.devices` for the whole 
 
 `install.sh` reads these options from the chosen host. With LUKS enabled it asks twice for a passphrase (the fallback if TPM2 is unavailable), passes it to disko via a temporary file, and never stores it in the repo. With TPM2 enabled it runs `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7` before `nixos-install`; crypttab gets the matching `tpm2-device=auto,tpm2-pcrs=7` options. PCR 7 follows Secure Boot state, so changing Secure Boot keys or firmware invalidates the TPM2 token — keep the passphrase. Auto-unlock adds roughly 0.2–1 s to boot; encryption itself costs a few percent I/O on CPUs with AES-NI, more without it. Without TPM2, boot waits for the passphrase prompt.
 
+### One-command install
+
+From the NixOS installer, after cloning this repo **outside `/mnt`** (the disko script mounts the target there):
+
+```bash
+git clone -b add-impermanence <url> /root/nixdots
+sudo /root/nixdots/install.sh   # DESTRUCTIVE
+```
+
+The script asks for the host, the target disk and the agenix SSH private key (nothing else is restored); hosts with LUKS also ask for a passphrase. The user name comes from the host config, so there is no `--user` flag. `--host`, `--device` and `--agenix-key` can be passed to skip the prompts. Secure Boot keys can be provided (`--sbctl-keys DIR`), generated (`--create-sbctl-keys`) or skipped (`--skip-sbctl-keys`); without a flag the script asks. It reads `flake.lock` to run the pinned disko version, sizes swap as `min(RAM,32G)`, runs `nixos-install`, installs the agenix key into the user's `~/.ssh`, places the Secure Boot keys in `/persistent/var/lib/sbctl` and checks both before rebooting. Run `install.sh --help` for details. Only the selected disk is wiped: other connected disks are untouched. Disko prints the selected disk and asks you to type `yes` before wiping it. Make your own backup first.
+
+Equivalent manual steps (boot the NixOS installer with this flake available, then):
+
+```bash
+# 1. Identify the target disk — never assume /dev/nvme0n1
+lsblk -d -o NAME,SIZE,MODEL,SERIAL
+ls -l /dev/disk/by-id/
+
+# 2. DESTRUCTIVE: wipes the disk and creates the partitions/subvolumes.
+#    The disk and the RAM size are passed only here, via --argstr; nothing is
+#    stored in the repo. Swap = min(RAM, 32 GiB); override with --argstr swapSize 8G.
+DISK=/dev/disk/by-id/<id-do-disco>
+RAM_GB=$(( $(awk '/MemTotal/ {print $2}' /proc/meminfo) / 1024 / 1024 ))
+sudo nix --experimental-features "nix-command flakes" run \
+  github:nix-community/disko/latest -- \
+  --mode destroy,format,mount --argstr device "$DISK" --argstr ramGb "$RAM_GB" \
+  ./hosts/nixyo/disko.nix
+
+# 3. Install. The resulting fileSystems/swapDevices use GPT partlabels,
+#    so the system never depends on the disk path given above.
+sudo nixos-install --flake .#nixyo
+```
+
+`hosts/nixyo/disko.nix` takes `device` as an argument with a placeholder default (`/dev/disk/by-id/DISKO_DEVICE`), so normal flake evaluation works without a disk but running its disko script without `--argstr device` fails loudly.
+
+Before the **first reboot**, put the Secure Boot keys into the persistent subvolume — `/var/lib/sbctl` is ephemeral and the machine cannot boot in user mode without them:
+
+```bash
+# after disko, the persistent subvolume is already mounted at /mnt/persistent
+sudo mkdir -p /mnt/persistent/var/lib/sbctl
+# create/copy the keys into /mnt/persistent/var/lib/sbctl (sbctl create-keys, or from a backup)
+```
+
+Notes:
+
+- The first boot moves the subvolume created by disko into `old_roots/` and creates a fresh `root`; that is expected. `old_roots` is kept for 30 days as a manual rollback point (rename a snapshot back to `root` to recover it); NixOS generations remain in `/nix`.
+- Inspecting `environment.persistence.<path>.directories` with plain `nix eval --json` currently trips [impermanence#305](https://github.com/nix-community/impermanence/issues/305); use `nix eval --apply 'ds: map (d: d.directory) ds'`. It does not affect evaluation or builds.
+
 ## Project templates
 
 `flake.nix` exposes flake templates for scaffolding new standalone projects:
