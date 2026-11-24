@@ -2,7 +2,6 @@
 # Fresh install of nixdots: disko (GPT/btrfs/swap) + NixOS + native impermanence.
 #
 # Run from a NixOS installer, AFTER cloning this repo outside /mnt:
-#   git clone -b add-impermanence <url> /root/nixdots
 #   sudo /root/nixdots/install.sh
 #
 # DESTRUCTIVE: it wipes the target disk. Only the agenix SSH key is restored.

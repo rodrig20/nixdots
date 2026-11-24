@@ -119,7 +119,6 @@ There is no hardcoded UUID/device: disko declares `disko.devices` for the whole 
 From the NixOS installer, after cloning this repo **outside `/mnt`** (the disko script mounts the target there):
 
 ```bash
-git clone -b add-impermanence <url> /root/nixdots
 sudo /root/nixdots/install.sh   # DESTRUCTIVE
 ```
 
