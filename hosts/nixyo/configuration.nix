@@ -3,16 +3,18 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
+    # Generated hardware bits (no disk layout) and the declarative disk layout.
+    ./hardware.nix
+    ./disko.nix
   ];
 
   hardware.pc = import ./hardware/nixyo.nix;
 
-  # Resume from the disk swap declared in hardware-configuration.nix.
-  # Derived from swapDevices so the UUID lives in one place only.
-  boot.resumeDevice = lib.head (map (d: d.device) config.swapDevices);
-
   systemSettings = {
+    # Disko owns fileSystems/swapDevices/boot.resumeDevice.
+    disko = {
+      enable = true;
+    };
     btrfs.enable = true;
     fuse.allowOther = true;
     gparted.enable = true;
