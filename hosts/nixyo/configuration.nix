@@ -73,6 +73,9 @@
     desktop.enable = true;
     stylix.enable = true;
     fonts.enable = true;
+    impermanence = {
+      enable = true;
+    };
     virtualisation = {
       podman.enable = true;
       libvirt.enable = true;

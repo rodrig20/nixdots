@@ -12,5 +12,11 @@ in
     # Starts the warp-svc systemd service, opens the WARP UDP port and puts warp-cli in the system PATH.
     # One-time manual step after enabling: sudo warp-cli --accept-tos registration new
     services.cloudflare-warp.enable = true;
+
+    # Impermanence: the manual warp-cli registration lives here
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = [ "/var/lib/cloudflare-warp" ];
+      };
   };
 }

@@ -27,5 +27,12 @@ in
     ];
 
     users.groups.libvirtd.members = [ config.systemSettings.users.name ];
+
+    # Impermanence: imperative VMs/disks created with virt-manager live here
+    # (see the module header).
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = [ "/var/lib/libvirt" ];
+      };
   };
 }

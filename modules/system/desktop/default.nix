@@ -55,5 +55,12 @@ in
         StopWhenUnneeded = "no";
       };
     };
+
+    # Impermanence: colour profiles only matter when colord itself runs
+    # (pulled in by e.g. GNOME/CUPS).
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = lib.optional config.services.colord.enable "/var/lib/colord";
+      };
   };
 }

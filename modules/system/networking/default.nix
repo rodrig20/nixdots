@@ -18,6 +18,20 @@ in
 
     networking.networkmanager.enable = true;
 
+    # Impermanence: Wi-Fi/Ethernet connections are created by hand (nmcli/GUI),
+    # so they must survive the ephemeral root. Host keys are only persisted
+    # once sshd is enabled somewhere; without the daemon they don't exist.
+    environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
+      lib.mkIf config.systemSettings.impermanence.enable {
+        directories = [ "/etc/NetworkManager/system-connections" ];
+        files = lib.optionals config.services.openssh.enable [
+          "/etc/ssh/ssh_host_ed25519_key"
+          { file = "/etc/ssh/ssh_host_ed25519_key.pub"; method = "symlink"; }
+          "/etc/ssh/ssh_host_rsa_key"
+          { file = "/etc/ssh/ssh_host_rsa_key.pub"; method = "symlink"; }
+        ];
+      };
+
     programs.ssh = {
       startAgent = true;
     };
