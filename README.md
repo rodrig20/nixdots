@@ -161,6 +161,25 @@ Notes:
 - The first boot moves the subvolume created by disko into `old_roots/` and creates a fresh `root`; that is expected. `old_roots` is kept for 30 days as a manual rollback point (rename a snapshot back to `root` to recover it); NixOS generations remain in `/nix`.
 - Inspecting `environment.persistence.<path>.directories` with plain `nix eval --json` currently trips [impermanence#305](https://github.com/nix-community/impermanence/issues/305); use `nix eval --apply 'ds: map (d: d.directory) ds'`. It does not affect evaluation or builds.
 
+### Password secrets (agenix)
+
+`/etc/shadow` lives on the wiped root subvolume, so passwords come from two encrypted secrets instead:
+
+| Secret | Feeds | Recipient in `agenix-rules.nix` |
+|---|---|---|
+| `secrets/nixyo-root-password.age` | `users.users.root.hashedPasswordFile` | `age` |
+| `secrets/nixyo-rodri-password.age` | `users.users.<user>.hashedPasswordFile` | `age` |
+
+Both secrets use the same `~/.ssh/id_ed25519_agenix` key. Encrypt the hashes:
+
+```bash
+openssl passwd -6
+echo '<hash>' | nix run github:ryantm/agenix -- -e secrets/nixyo-root-password.age
+echo '<hash>' | nix run github:ryantm/agenix -- -e secrets/nixyo-rodri-password.age
+```
+
+The two `.age` files are placeholders until you replace them.
+
 ## Project templates
 
 `flake.nix` exposes flake templates for scaffolding new standalone projects:

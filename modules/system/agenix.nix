@@ -1,8 +1,10 @@
-# Agenix settings: SSH identity used to decrypt .age secrets via Home Manager.
-{ config, lib, ... }:
+# Agenix settings: SSH identity used to decrypt .age secrets via Home Manager,
+# plus the two system-level password hashes consumed by sysusers.
+{ config, lib, inputs, ... }:
 
 let
   cfg = config.systemSettings.agenix;
+  user = config.systemSettings.users.name;
 in
 {
   options.systemSettings.agenix = {
@@ -15,12 +17,42 @@ in
         SSH private key used to decrypt .age files.
         The matching public key must be a recipient in agenix-rules.nix (repo root).
       '';
-      example = "/home/user/.ssh/id_ed25519_agenix";
+      example = "/home/user/.ssh/id_ed25519";
     };
   };
 
-  # Home Manager decrypts with the agenix SSH key only.
+  # Imports cannot be conditional; the NixOS module only activates via age.* below.
+  imports = [ inputs.agenix.nixosModules.default ];
+
   config = lib.mkIf cfg.enable {
-    home-manager.users.${config.systemSettings.users.name}.age.identityPaths = lib.mkForce [ cfg.identityPath ];
+    home-manager.users.${user}.age.identityPaths = lib.mkForce [ cfg.identityPath ];
+
+    # NixOS activation decrypts these with the persisted host key and/or the
+    # user's agenix key. /etc/ssh host keys and /home are both persistent.
+    age = {
+      identityPaths = [
+        "/etc/ssh/ssh_host_ed25519_key"
+        "${cfg.identityPath}"
+      ];
+      secrets = {
+        nixyo-root-password = {
+          file = ../../secrets/nixyo-root-password.age;
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+        nixyo-rodri-password = {
+          file = ../../secrets/nixyo-rodri-password.age;
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+      };
+    };
+
+    # Durable passwords: /etc/shadow lives on the wiped root subvolume, so a
+    # hashedPasswordFile from the Nix store is required.
+    users.users.root.hashedPasswordFile = config.age.secrets.nixyo-root-password.path;
+    users.users.${user}.hashedPasswordFile = config.age.secrets.nixyo-rodri-password.path;
   };
 }
