@@ -64,11 +64,21 @@ The disk layout is declarative: `hosts/<name>/disko.nix` creates a GPT with an E
 imports = [ ./hardware.nix ./disko.nix ];
 
 systemSettings = {
-  disko.enable = true;
+  disko = {
+    enable = true;
+    luks.enable = true;
+    luks.tpm2 = true; # requires luks.enable
+  };
 };
 ```
 
 There is no hardcoded UUID/device: disko declares `disko.devices` for the whole disk and the target device is passed with `--argstr device /dev/disk/by-id/<id>` when formatting.
+
+### Per-host LUKS and TPM2
+
+`systemSettings.disko.luks.enable` wraps the btrfs partition (root/persistent/home/nix) in LUKS named `cryptroot`; `/boot` and swap stay plaintext. `systemSettings.disko.luks.tpm2` is independent per host but requires LUKS. Both default to `false`, so existing hosts are unchanged.
+
+`install.sh` reads these options from the chosen host. With LUKS enabled it asks twice for a passphrase (the fallback if TPM2 is unavailable), passes it to disko via a temporary file, and never stores it in the repo. With TPM2 enabled it runs `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7` before `nixos-install`; crypttab gets the matching `tpm2-device=auto,tpm2-pcrs=7` options. PCR 7 follows Secure Boot state, so changing Secure Boot keys or firmware invalidates the TPM2 token — keep the passphrase. Auto-unlock adds roughly 0.2–1 s to boot; encryption itself costs a few percent I/O on CPUs with AES-NI, more without it. Without TPM2, boot waits for the passphrase prompt.
 
 ## Project templates
 
