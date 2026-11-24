@@ -106,6 +106,7 @@
       };
       antigravity-cli.enable = true;
       nautilus.enable = true;
+      baobab.enable = true;
       onlyoffice.enable = true;
       loupe.enable = true;
       mpv.enable = true;
