@@ -26,8 +26,9 @@ Options:
   --host NAME            host directory under hosts/NAME
   --device DEVICE        whole disk, preferably /dev/disk/by-id/...
   --agenix-key FILE      agenix SSH private key, copied to the user's ~/.ssh
-  --sbctl-keys DIR       Secure Boot keys to copy into /persistent/var/lib/sbctl
-  --create-sbctl-keys    generate new keys with sbctl (requires Setup Mode)
+  --sbctl-keys DIR       reuse existing keys (copied to the target and /var/lib/sbctl)
+  --create-sbctl-keys    generate and enroll new keys (requires Setup Mode;
+                         TPM2 enrollment is deferred until Secure Boot is final)
   --skip-sbctl-keys      continue without Secure Boot keys (warns at the end)
   -h, --help             show this help
 
@@ -40,6 +41,23 @@ EOF
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 info() { printf '\n==> %s\n' "$*"; }
 ok() { printf '  ✓ %s\n' "$*"; }
+warn() { printf '  ! %s\n' "$*"; }
+
+# Discover the UEFI variable GUID from sysfs instead of hardcoding it.
+efivar_byte() {
+  local name="$1" matches
+  matches=(/sys/firmware/efi/efivars/"$name"-*)
+  [[ -r "${matches[0]}" ]] || return 2
+  tail -c 1 "${matches[0]}" | od -An -tu1 | tr -d '[:space:]'
+}
+
+sbctl_run() {
+  if command -v sbctl >/dev/null; then
+    sbctl "$@"
+  else
+    nix --extra-experimental-features "nix-command flakes" shell nixpkgs#sbctl -c sbctl "$@"
+  fi
+}
 
 while (($#)); do
   case "$1" in
@@ -142,6 +160,37 @@ else
   esac
 fi
 
+# --- Secure Boot preparation -----------------------------------------------
+# Lanzaboote reads /var/lib/sbctl at BUILD time, so the keys must exist in the
+# installer before nixos-install, not only in the target's persistent subvolume.
+ENROLL_TPM_NOW=true
+case "$KEY_MODE" in
+  path)
+    [[ -d "$SBCTL_KEYS" ]] || die "key directory not found: $SBCTL_KEYS"
+    mkdir -p /var/lib/sbctl
+    cp -a "$SBCTL_KEYS/." /var/lib/sbctl/
+    chmod -R go-rwx /var/lib/sbctl
+    ok "existing keys staged in /var/lib/sbctl for the build"
+    ;;
+  generate)
+    SETUP_MODE="$(efivar_byte SetupMode || true)"
+    [[ "$SETUP_MODE" == "1" ]] || die "generating keys requires Setup Mode: BIOS -> Clear keys / Setup Mode, reboot, then rerun with --create-sbctl-keys"
+    [[ ! -d /var/lib/sbctl/keys ]] || die "keys already exist in /var/lib/sbctl — back them up before generating new ones"
+    info "Generating new Secure Boot keys..."
+    sbctl_run create-keys
+    info "Enrolling them in firmware (with Microsoft keys)..."
+    sbctl_run enroll-keys --microsoft
+    sbctl_run verify || warn "sbctl verify reported unsigned files; check after the install"
+    ok "new keys generated and enrolled in firmware"
+    # Enrolling keys/switching Secure Boot changes PCR 7. The token must be
+    # created after the firmware is in its final state, i.e. after the reboot.
+    ENROLL_TPM_NOW=false
+    ;;
+  skip)
+    warn "no Secure Boot keys — Lanzaboote cannot sign the bootloader without them"
+    ;;
+esac
+
 # Disko prints the disk it will wipe and asks for "yes" before destroying it.
 
 # --- Disko -----------------------------------------------------------------
@@ -166,21 +215,39 @@ nix --extra-experimental-features "nix-command flakes" run "github:nix-community
   "${DISKO_ARGS[@]}" "$REPO_ROOT/hosts/$HOST/disko.nix"
 ok "subvolumes root/persistent/home/nix created and mounted under $ROOT_MOUNTPOINT"
 
+# --- Secure Boot keys in the target ----------------------------------------
+# /var/lib/sbctl is ephemeral; the persistent copy is what survives the wipe.
+KEY_DEST="$ROOT_MOUNTPOINT/persistent/var/lib/sbctl"
+if [[ "$KEY_MODE" == "skip" ]]; then
+  warn "no Secure Boot keys installed at $KEY_DEST"
+else
+  mkdir -p "$KEY_DEST"
+  cp -a /var/lib/sbctl/. "$KEY_DEST/"
+  chmod -R go-rwx "$KEY_DEST"
+  ok "Secure Boot keys stored in $KEY_DEST"
+fi
+
 # --- TPM2 enrollment --------------------------------------------------------
 # Disko creates the LUKS header but does not enroll a TPM2 key. PCR 7 matches
 # crypttabExtraOpts in hosts/$HOST/disko.nix (Secure Boot state).
 if [[ "$LUKS_ENABLED" == "true" && "$TPM2_ENABLED" == "true" ]]; then
   [[ -n "$LUKS_DEVICE" ]] || die "could not read the LUKS device from $HOST config"
-  info "Enrolling TPM2 key in $LUKS_DEVICE (PCR 7)..."
-  if command -v systemd-cryptenroll >/dev/null; then
-    systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 \
-      --unlock-key-file="$LUKS_KEY_FILE" "$LUKS_DEVICE"
-  else
-    nix --extra-experimental-features "nix-command flakes" shell nixpkgs#systemd -c \
+  if $ENROLL_TPM_NOW; then
+    info "Enrolling TPM2 key in $LUKS_DEVICE (PCR 7)..."
+    if command -v systemd-cryptenroll >/dev/null; then
       systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 \
-      --unlock-key-file="$LUKS_KEY_FILE" "$LUKS_DEVICE"
+        --unlock-key-file="$LUKS_KEY_FILE" "$LUKS_DEVICE"
+    else
+      nix --extra-experimental-features "nix-command flakes" shell nixpkgs#systemd -c \
+        systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 \
+        --unlock-key-file="$LUKS_KEY_FILE" "$LUKS_DEVICE"
+    fi
+    ok "TPM2 key enrolled"
+  else
+    warn "TPM2 enrollment deferred: firmware is not in its final state yet."
+    printf '  After enabling Secure Boot in BIOS and rebooting, run:\n'
+    printf '    sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 %s\n' "$LUKS_DEVICE"
   fi
-  ok "TPM2 key enrolled"
 fi
 
 # --- Agenix key -------------------------------------------------------------
@@ -206,41 +273,29 @@ USER_GID="$(awk -F: '$1 == "users" { print $3; exit }' "$ROOT_MOUNTPOINT/etc/gro
 chown -R "${USER_UID:-1000}:${USER_GID:-100}" "$SSH_DIR"
 ok "agenix key installed at $SSH_DIR/id_ed25519_agenix"
 
-# --- Secure Boot -----------------------------------------------------------
-KEY_DEST="$ROOT_MOUNTPOINT/persistent/var/lib/sbctl"
-case "$KEY_MODE" in
-  path)
-    [[ -d "$SBCTL_KEYS" ]] || die "key directory not found: $SBCTL_KEYS"
-    mkdir -p "$KEY_DEST"
-    cp -a "$SBCTL_KEYS/." "$KEY_DEST/"
-    ok "Secure Boot keys copied to $KEY_DEST"
-    ;;
-  generate)
-    info "Generating Secure Boot keys (requires Setup Mode)..."
-    nix --extra-experimental-features "nix-command flakes" shell nixpkgs#sbctl -c sbctl create-keys
-    mkdir -p "$KEY_DEST"
-    cp -a /var/lib/sbctl/. "$KEY_DEST/"
-    ok "Secure Boot keys generated and copied to $KEY_DEST"
-    printf '  New keys also need: nix shell nixpkgs#sbctl -c sbctl enroll-keys --microsoft\n'
-    ;;
-  skip)
-    printf '  WARNING: no Secure Boot keys in %s — user mode may fail.\n' "$KEY_DEST"
-    ;;
-esac
-
 # --- Final checks ----------------------------------------------------------
 info "Checks before reboot:"
 for path in "$KEY_DEST" "$SSH_DIR/id_ed25519_agenix"; do
   if [[ -e "$path" ]]; then ok "$path"; else printf '  ! missing: %s\n' "$path"; fi
 done
 if [[ "$LUKS_ENABLED" == "true" ]]; then
-  if [[ "$TPM2_ENABLED" == "true" ]] && command -v systemd-cryptenroll >/dev/null \
+  if ! $ENROLL_TPM_NOW && [[ "$TPM2_ENABLED" == "true" ]]; then
+    printf '  ! TPM2 enrollment pending — run the command printed above after Secure Boot is final\n'
+  elif [[ "$TPM2_ENABLED" == "true" ]] && command -v systemd-cryptenroll >/dev/null \
     && systemd-cryptenroll "$LUKS_DEVICE" 2>/dev/null | grep -qw tpm2; then
     ok "TPM2 token enrolled in $LUKS_DEVICE"
   else
     printf '  ! no TPM2 token found — the LUKS passphrase is required at boot\n'
   fi
   printf '  Keep the LUKS passphrase: firmware/Secure Boot key changes invalidate TPM2.\n'
+fi
+
+if [[ "$KEY_MODE" == "generate" ]]; then
+  info "New Secure Boot keys — after this reboot:"
+  printf '  1. BIOS -> Secure Boot = Enabled\n'
+  printf '  2. Unlock LUKS with the passphrase and log in\n'
+  printf '  3. Run the systemd-cryptenroll command printed above\n'
+  printf '  4. sudo sbctl verify\n'
 fi
 
 printf '\nDone. Reboot now? [y/N]: '
