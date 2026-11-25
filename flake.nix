@@ -78,7 +78,7 @@
 
     # Google Antigravity CLI and apps
     antigravity-nix = {
-      url = "github:jacopone/antigravity-nix/v2.35.0-6394266482769920";
+      url = "github:jacopone/antigravity-nix/v2.35.1-4615540875067392";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
