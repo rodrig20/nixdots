@@ -163,6 +163,7 @@
         };
       };
     };
+    wallpapers.enable = true;
     xdg.enable = true;
     stylix.enable = true;
   };
