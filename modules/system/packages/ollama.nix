@@ -16,6 +16,10 @@ in
     services.ollama = {
       enable = true;
 
+      # Static user: DynamicUser cannot move the bind-mounted StateDirectory.
+      user = "ollama";
+      group = "ollama";
+
       # Vulkan backend only on Intel iGPU (SYCL/oneAPI not packaged yet);
       # stock build elsewhere.
       package =
@@ -36,6 +40,15 @@ in
         OLLAMA_IGPU_ENABLE = "1";
       };
     };
+
+    # Upstream sets DynamicUser even with User=/Group=; force it off.
+    systemd.services.ollama.serviceConfig.DynamicUser = lib.mkForce false;
+
+    # Include the parent: impermanence creates it root-owned on fresh installs.
+    systemd.services.ollama.serviceConfig.StateDirectory = lib.mkForce [
+      "ollama"
+      "ollama/models"
+    ];
 
     # Impermanence: pulled models (multi-GB) would otherwise be re-downloaded
     # on every boot.

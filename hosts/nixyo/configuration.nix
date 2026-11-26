@@ -10,6 +10,8 @@
 
   hardware.pc = import ./hardware/nixyo.nix;
 
+  fileSystems."/home".neededForBoot = true;
+
   systemSettings = {
     # Disko owns fileSystems/swapDevices/boot.resumeDevice.
     disko = {

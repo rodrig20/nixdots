@@ -10,7 +10,10 @@ in
   config = lib.mkIf cfg.enable {
     # Required by GDM
     services.xserver.enable = true;
-    services.displayManager.gdm.enable = true;
+    services.displayManager = {
+      gdm.enable = true;
+      defaultSession = "hyprland";
+    }
 
     # File manager trash support, MTP, etc.
     services.gvfs.enable = true;

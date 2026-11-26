@@ -27,11 +27,8 @@ in
   config = lib.mkIf cfg.enable {
     home-manager.users.${user}.age.identityPaths = lib.mkForce [ cfg.identityPath ];
 
-    # NixOS activation decrypts these with the persisted host key and/or the
-    # user's agenix key. /etc/ssh host keys and /home are both persistent.
     age = {
       identityPaths = [
-        "/etc/ssh/ssh_host_ed25519_key"
         "${cfg.identityPath}"
       ];
       secrets = {

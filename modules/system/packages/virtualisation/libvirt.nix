@@ -32,7 +32,11 @@ in
     # (see the module header).
     environment.persistence.${config.systemSettings.impermanence.persistentStoragePath} =
       lib.mkIf config.systemSettings.impermanence.enable {
-        directories = [ "/var/lib/libvirt" ];
+        directories = [
+          "/var/lib/libvirt"
+          # Directory, not file: systemd-creds creates credential.secret (0400).
+          "/var/lib/systemd"
+        ];
       };
   };
 }
