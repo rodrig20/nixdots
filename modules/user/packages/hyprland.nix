@@ -31,6 +31,7 @@ in
         { _args = [ "XCURSOR_THEME" cursorName ]; }
         { _args = [ "HYPRCURSOR_SIZE" cursorSize ]; }
         { _args = [ "HYPRCURSOR_THEME" cursorName ]; }
+        { _args = [ "GDK_WAYLAND_DISABLE" "ext_background_effect_manager_v1" ]; }
       ];
 
       extraLuaFiles = {
