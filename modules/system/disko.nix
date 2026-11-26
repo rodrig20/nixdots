@@ -2,8 +2,8 @@
 # to avoid re-declaring options (e.g. btrfs mount options) that disko owns.
 #
 # LUKS and TPM2 are per-host choices. Each host sets them in its own
-# configuration.nix; install.sh reads the same options and forwards them to
-# disko as --argstr luks / --argstr tpm2 (plus --argstr passwordFile).
+# configuration.nix; the manual install reads the same options and forwards
+# them to disko as --argstr luks / --argstr tpm2 (plus --argstr passwordFile).
 { config, lib, ... }:
 
 let

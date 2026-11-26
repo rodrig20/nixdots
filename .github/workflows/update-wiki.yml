@@ -1,0 +1,50 @@
+name: Update Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/**'
+      - 'hosts/**'
+      - 'secrets/**'
+      - 'lib/**'
+      - 'proxy/**'
+      - 'templates/**'
+      - 'docs/**'
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'scripts/generate-wiki.sh'
+      - '.github/workflows/update-wiki.yml'
+      - 'README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  wiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate wiki content
+        run: bash scripts/generate-wiki.sh wiki-out
+
+      - name: Checkout wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update wiki
+        run: |
+          cp wiki-out/*.md wiki/
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "docs: update wiki [skip ci]"
+          git push
