@@ -44,7 +44,7 @@
     };
 
     gaze = {
-      url = "github:GunduLabs/gaze/v0.5.2";
+      url = "github:GunduLabs/gaze/v0.5.3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -88,7 +88,7 @@
 
     # Google Antigravity CLI and apps
     antigravity-nix = {
-      url = "github:jacopone/antigravity-nix/v2.35.1-4615540875067392";
+      url = "github:jacopone/antigravity-nix/v2.35.2-4585983447007232";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
