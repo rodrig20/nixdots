@@ -12,3 +12,6 @@ __pycache__/
 nix-cache-signing.key
 nix-cache-signing.key.pub
 public-key.txt
+
+# Generated GitHub wiki pages (published by .github/workflows/update-wiki.yml)
+wiki-out/
