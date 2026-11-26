@@ -197,7 +197,7 @@ def flake_inputs() -> list[tuple[str, str, str]]:
             (
                 name,
                 url.group(1) if url else "",
-                ", ".join(f"{source} → {target}" for source, target in follows),
+                ", ".join(sorted({target for _, target in follows})) or "none",
             )
         )
     return sorted(rows)
@@ -438,7 +438,7 @@ def enrich_option(desc: str, comment: str) -> str:
         return desc
     if sentence.split()[0].rstrip(":").lower() == bare.lower():
         return first
-    return f"{bare} — {first}"
+    return f"{bare}: {first}"
 
 
 def render_module_page(title: str, base: str, source: str) -> None:
@@ -483,7 +483,7 @@ def render_module_page(title: str, base: str, source: str) -> None:
         for heading, entries in sections:
             count = len(entries)
             lines.append(
-                f"- [{heading}](#{anchor(heading)}) — {count} module{'s' if count != 1 else ''}"
+                f"- [{heading}](#{anchor(heading)}): {count} module{'s' if count != 1 else ''}"
             )
         lines.append("")
 
@@ -517,15 +517,15 @@ def render_home() -> None:
         f"# {title}",
         "",
         "_This wiki is generated from the repository by `scripts/generate-wiki.sh`. "
-        "Do not edit these pages by hand — edit the Nix files instead._",
+        "Do not edit these pages by hand. Edit the Nix files and `docs/install.md` instead._",
         "",
         "## Pages",
         "",
-        "- [Install and configuration](Install) — fresh install, storage/LUKS/TPM2, agenix, module options",
-        "- [System modules](System-Modules) — options, enabled services and packages per module",
-        "- [User modules](User-Modules) — Home Manager modules and their options",
-        "- [Hardware](Hardware) — per-host hardware profiles and reusable hardware modules",
-        "- [Development](Development) — templates, cache/proxy tooling, workflows",
+        "- [Install and configuration](Install): fresh install, storage/LUKS/TPM2, agenix, module options",
+        "- [System modules](System-Modules): options, enabled services and packages per module",
+        "- [User modules](User-Modules): Home Manager modules and their options",
+        "- [Hardware](Hardware): per-host hardware profiles and reusable hardware modules",
+        "- [Development](Development): templates, cache/proxy tooling, workflows",
         "",
         "The repository `README.md` is only a quickstart. The long-form guide is "
         "maintained in `docs/install.md` and published here as the Install page.",
@@ -550,7 +550,7 @@ def render_home() -> None:
         ) if (host / "hardware").is_dir() else []
         lines.append(
             f"| `{host.name}` | {len(files)} | {len(enabled)} | "
-            f"{', '.join(f'`{p}`' for p in profiles) or '—'} |"
+            f"{', '.join(f'`{p}`' for p in profiles) or 'none'} |"
         )
 
     lines.extend(["", "## Flake inputs", "", "| Input | URL | Follows |", "|---|---|---|"])
@@ -591,8 +591,8 @@ def render_install() -> None:
     lines = [
         "# Installation and configuration guide",
         "",
-        "_Generated from `docs/install.md`. Do not edit this wiki page by hand — "
-        "edit the file in the repository instead._",
+        "_Generated from `docs/install.md`. Do not edit this wiki page by hand. "
+        "Edit the file in the repository instead._",
         "",
         "[← Home](Home)",
         "",
@@ -600,7 +600,7 @@ def render_install() -> None:
     if source:
         lines.append(escape_tags(source.strip()))
     else:
-        lines.append("_`docs/install.md` is missing — add it to the repository._")
+        lines.append("_`docs/install.md` is missing. Add it to the repository._")
     write_page("Install.md", lines)
 
 
@@ -625,7 +625,7 @@ def render_hardware() -> None:
             gpu = re.search(r'\bgpuVendor\s*=\s*"([^"]+)"', src)
             lines.append(
                 f"| `{host.name}` | `{profile.name}` | "
-                f"{cpu.group(1) if cpu else '—'} | {gpu.group(1) if gpu else '—'} |"
+                f"{cpu.group(1) if cpu else 'none'} | {gpu.group(1) if gpu else 'none'} |"
             )
 
     lines.extend(["", "## Modules", ""])
@@ -665,8 +665,8 @@ def render_development() -> None:
         "`.github/workflows/update-wiki.yml` runs on pushes to `main` that touch the "
         "source directories and on manual dispatch. It runs `scripts/generate-wiki.sh`, "
         "checks out `<repo>.wiki`, copies the generated pages and pushes them as "
-        "`github-actions[bot]`. Wiki pages are therefore a build artifact, not a second "
-        "place to maintain documentation — manual edits in the wiki are overwritten.",
+        "`github-actions[bot]`. Wiki pages are a build artifact, not a second "
+        "place to maintain documentation. Manual edits in the wiki are overwritten.",
         "",
         "## Templates",
         "",
@@ -676,7 +676,7 @@ def render_development() -> None:
             continue
         rel = path.relative_to(root).as_posix()
         description = one_line(first_comment(rel))
-        lines.append(f"- `{rel}`" + (f" — {description}" if description else ""))
+        lines.append(f"- `{rel}`" + (f": {description}" if description else ""))
 
     for heading, directory in [
         ("Library helpers", "lib"),
@@ -688,13 +688,13 @@ def render_development() -> None:
                 continue
             rel = path.relative_to(root).as_posix()
             description = one_line(first_comment(rel))
-            lines.append(f"- `{rel}`" + (f" — {description}" if description else ""))
+            lines.append(f"- `{rel}`" + (f": {description}" if description else ""))
 
     lines.extend(["", "## Workflows", ""])
     for path in sorted((root / ".github/workflows").glob("*.yml")):
         rel = path.relative_to(root).as_posix()
         name = re.search(r'(?m)^name:\s*(.+)$', read(rel))
-        lines.append(f"- `{rel}` — {name.group(1).strip() if name else path.stem}")
+        lines.append(f"- `{rel}`: {name.group(1).strip() if name else path.stem}")
 
     lines.extend(
         [

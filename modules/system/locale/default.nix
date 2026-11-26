@@ -1,4 +1,4 @@
-# Locale and keyboard layout — Portuguese (Portugal) with English system locale.
+# English default locale with Portuguese regional settings and a Portuguese keyboard layout.
 { config, pkgs, lib, ... }:
 
 let

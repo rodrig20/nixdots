@@ -1,8 +1,8 @@
 # Gaze facial authentication: sudo + GDM face login, TPM keyring unlock.
 #
 # Cameras are set in configuration.nix (systemSettings.gaze.camera.*).
-# gaze only accepts "primary", /dev/videoN or usb:VID:PID — /dev/v4l symlinks
-# are refused for privileged capture. Both spectra share the same device here:
+# gaze accepts "primary", /dev/videoN or usb:VID:PID. It refuses /dev/v4l
+# symlinks for privileged capture. Here both cameras share one USB device:
 #   usb:174f:11b3 -> rgb: /dev/video0 (color), ir: /dev/video2 (mono 8-bit)
 # Set either to "" to use the other alone.
 #

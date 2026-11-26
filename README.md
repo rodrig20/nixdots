@@ -1,16 +1,16 @@
 # NixOS Configuration
 
-Personal NixOS flake for **NixYo** (Lenovo Yoga Slim 7 14ILL10). Modules are self-contained and mostly gated by an `enable` option; a host enables only what it needs. Adding a machine is just a new `hosts/<name>/` directory.
+Personal NixOS flake for **NixYo** (Lenovo Yoga Slim 7 14ILL10). Most modules are self-contained and have an `enable` option, so each host turns on only what it needs. Adding a machine means adding a new `hosts/<name>/` directory.
 
 ## Documentation
 
-The long-form docs live in the [GitHub wiki](https://github.com/rodrig20/nixdots/wiki), generated from the source tree by `scripts/generate-wiki.sh` (`.github/workflows/update-wiki.yml` publishes it on pushes to `main`). Edit the Nix files or `docs/install.md` — **do not edit the wiki pages by hand**.
+The long-form docs are in the [GitHub wiki](https://github.com/rodrig20/nixdots/wiki). `scripts/generate-wiki.sh` builds those pages from this repository, and `.github/workflows/update-wiki.yml` publishes them on pushes to `main`. Edit `docs/install.md` or the Nix files, not the wiki pages.
 
-- [Install and configuration](https://github.com/rodrig20/nixdots/wiki/Install) — fresh install, disk layout, LUKS/TPM2, agenix secrets, host/module configuration
-- [System modules](https://github.com/rodrig20/nixdots/wiki/System-Modules) — `systemSettings.*` options, services, packages
-- [User modules](https://github.com/rodrig20/nixdots/wiki/User-Modules) — `userSettings.*` options and Home Manager packages
-- [Hardware](https://github.com/rodrig20/nixdots/wiki/Hardware) — per-host CPU/GPU profiles
-- [Development](https://github.com/rodrig20/nixdots/wiki/Development) — templates, cache/proxy tooling, workflows
+- [Install and configuration](https://github.com/rodrig20/nixdots/wiki/Install): fresh install, disk layout, LUKS/TPM2, agenix secrets, host and module configuration
+- [System modules](https://github.com/rodrig20/nixdots/wiki/System-Modules): `systemSettings.*` options, services and packages
+- [User modules](https://github.com/rodrig20/nixdots/wiki/User-Modules): `userSettings.*` options and Home Manager packages
+- [Hardware](https://github.com/rodrig20/nixdots/wiki/Hardware): per-host CPU/GPU profiles
+- [Development](https://github.com/rodrig20/nixdots/wiki/Development): templates, cache and proxy tooling, workflows
 
 ## Quick start
 
@@ -20,9 +20,9 @@ cd ~/nixdots
 sudo nixos-rebuild switch --flake .#nixyo
 ```
 
-With `systemSettings.nh` enabled and the flake set in the host config: `sudo nh os switch`
+With `systemSettings.nh` enabled and the flake set in the host config, run `sudo nh os switch`.
 
-The fresh install is **DESTRUCTIVE** and manual — follow the [wiki Install page](https://github.com/rodrig20/nixdots/wiki/Install) instead of doing it from memory. Keep `luks.key` out of git; `secrets/*.age` are agenix-encrypted and safe to track.
+The fresh install is manual and **DESTRUCTIVE**. Follow the [wiki Install page](https://github.com/rodrig20/nixdots/wiki/Install) instead of doing it from memory. Keep `luks.key` out of git. The `secrets/*.age` files are agenix-encrypted and safe to track.
 
 ## Repository layout
 
@@ -38,7 +38,7 @@ The fresh install is **DESTRUCTIVE** and manual — follow the [wiki Install pag
 | `secrets/`, `agenix-rules.nix` | agenix-encrypted secrets and their recipients |
 | `lib/`, `proxy/`, `templates/` | Module importer, binary cache pipeline/proxy, flake template |
 
-Every file under `modules/*/packages/` is one self-contained module: drop the file in and toggle its option in the host config — no central registry to update.
+Every file under `modules/*/packages/` is a self-contained module. Add the file, then toggle its option in the host config. No central registry needs updating.
 
 ## Contributing to the docs
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cache-builder.sh — Build, filter, and upload a Nix binary cache to GHCR (OCI).
+# Build, filter and upload a Nix binary cache to GHCR (OCI).
 #
 # Entry point only: shared defaults and info/err, then sources lib/cache/*.sh
 # (one file per responsibility; the map lives in the README). Derived from
