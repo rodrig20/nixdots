@@ -13,7 +13,7 @@ in
     services.displayManager = {
       gdm.enable = true;
       defaultSession = "hyprland";
-    }
+    };
 
     # File manager trash support, MTP, etc.
     services.gvfs.enable = true;
