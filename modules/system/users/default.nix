@@ -29,6 +29,9 @@ in
 
     programs.zsh.enable = true;
 
+    # Avoid the default sudo lecture on first use.
+    security.sudo.extraConfig = "Defaults lecture=never";
+
     users.users.${cfg.name} = {
       isNormalUser = true;
       description = cfg.description;
