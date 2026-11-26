@@ -68,12 +68,35 @@ in
         };
       };
 
+      profiles.default.pins = {
+        "WhatsApp" = {
+          id = "9bd3b573-b9ee-4597-b967-69a377966264";
+          url = "https://web.whatsapp.com/";
+          isEssential = true;
+          position = 101;
+        };
+        "GitHub" = {
+          id = "f1fc2311-cba2-4115-be97-5e231caebf73";
+          url = "https://github.com/";
+          isEssential = true;
+          position = 102;
+        };
+        "Gemini" = {
+          id = "88ec6487-10e5-4ea1-865e-e0d73097273c";
+          url = "https://gemini.google.com/";
+          isEssential = true;
+          position = 103;
+        };
+      };
+
       profiles.default.settings =
         {
           # Never auto-offer page translation (manual translation keeps working).
           "browser.translations.automaticallyPopup" = false;
           # Default spellcheck language.
           "spellchecker.dictionary" = "pt-PT";
+          # Move the sidebar to the right.
+          "zen.tabs.vertical.right-side" = true;
         }
         // lib.optionalAttrs (cfg.uiScale != null) {
           # UI + web content scale (userSettings.programs.zen-browser.uiScale).
