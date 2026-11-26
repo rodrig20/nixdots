@@ -41,6 +41,7 @@
     curl.enable = true;
     jq.enable = true;
     tldr.enable = true;
+    comma.enable = true;
     btop.enable = true;
     pciutils.enable = true;
     unzip.enable = true;
