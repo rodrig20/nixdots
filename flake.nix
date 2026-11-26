@@ -86,6 +86,12 @@
       flake = false;
     };
 
+    # Prebuilt nix-index database for comma/nix-locate.
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Google Antigravity CLI and apps
     antigravity-nix = {
       url = "github:jacopone/antigravity-nix/v2.35.2-4585983447007232";
@@ -138,6 +144,7 @@
               }
 
               inputs.stylix.nixosModules.stylix
+              inputs.nix-index-database.nixosModules.default
             ];
           };
         }) hosts

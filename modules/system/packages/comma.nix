@@ -1,5 +1,5 @@
 # comma: run nixpkgs binaries without installing them (`, <cmd>`).
-{ config, pkgs, lib, ... }:
+{ config, lib, ... }:
 
 let
   cfg = config.systemSettings.comma;
@@ -8,8 +8,7 @@ in
   options.systemSettings.comma.enable = lib.mkEnableOption "comma (run nixpkgs binaries without installing)";
 
   config = lib.mkIf cfg.enable {
-    # nix-index fornece a base de dados usada pelo comma para localizar comandos.
-    programs.nix-index.enable = true;
-    environment.systemPackages = [ pkgs.comma ];
+    # Uses the prebuilt nix-index database from nix-index-database.
+    programs.nix-index-database.comma.enable = true;
   };
 }
