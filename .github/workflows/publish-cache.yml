@@ -4,6 +4,7 @@
 # ghcr.io/<repo>/nix-cache. Consumed by services.nixcache-proxy on NixOS and by
 # the self-substituter in pr-check/auto-update.
 name: Publish binary cache
+run-name: Publish binary cache
 
 on:
   push:

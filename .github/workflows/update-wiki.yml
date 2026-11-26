@@ -1,4 +1,5 @@
 name: Update Wiki
+run-name: Update Wiki
 
 on:
   push:
