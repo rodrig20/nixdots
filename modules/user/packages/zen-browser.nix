@@ -62,7 +62,7 @@ in
                 ];
               }
             ];
-            icon = "https://search.brave.com/favicon.ico";
+            icon = "https://brave.com/favicon.ico";
             definedAliases = [ "@brave" ];
           };
         };
